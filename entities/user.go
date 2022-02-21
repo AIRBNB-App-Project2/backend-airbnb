@@ -10,4 +10,5 @@ type User struct {
 	Name     string
 	Email    string `gorm:"unique"`
 	Password string
+	Rule     string `gorm:"type:enum('customer', 'owner');default:'customer'"`
 }
