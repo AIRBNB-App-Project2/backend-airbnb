@@ -19,12 +19,12 @@ tags:
     description: login
   - name: user
     description: user
-  - name: all product
-    description: access to all product
-  - name: my product
-    description: access to my product
-  - name: cart
-    description: cart for transaction
+  - name: all rooms
+    description: access to all rooms
+  - name: my rooms
+    description: access to my rooms
+  - name: booking
+    description: booking a room
   - name: order detail
     description: cart which is fix
   - name: order
@@ -59,7 +59,7 @@ paths:
                 $ref: '#/components/schemas/loginHttpResponse'
               example:
                 code: 400
-                message: error in request for login
+                message: error bad request for login
                 data: null
         '500':
           description: internal server error in login
@@ -107,7 +107,7 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 400
-                message: error in request for create user
+                message: error bad request for create new user
                 data:
         '500':
           description: internal server error in create user
@@ -117,7 +117,7 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create user
+                message: error internal server error for create new user
                 data:
         '200':
           description: success create user
@@ -127,9 +127,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 200
-                message: success create user
+                message: success create new user
                 data:
-                  id: 1
+                  user_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
@@ -247,22 +247,22 @@ paths:
   /room/all:
     get:
       tags:
-        - all product
-      summary: get all products
-      description: user can wacth all products
+        - all rooms
+      summary: get all rooms
+      description: user can wacth all rooms
       responses:
         '500':
-          description: internal server error in get all product
+          description: internal server error in get all rooms
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get all product
+                message: error internal server error for get all rooms
                 data:
         '200':
-          description: success get all
+          description: success get all rooms
           content:
             application/json:
               schema:
@@ -273,69 +273,73 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all products
+                    example: success get all rooms
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/productDataResponse'
                     example:
-                      - id: 1
+                      - room_uid: 1
                         created_at: 2022-02-15T02:18:32.857Z
                         updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim
-                        product_type: 1
+                        image: image
+                        rating: 4.5
                         price: 1000
-                        qty: 10
-                        description: anonim description
-                      - id: 2
+                        detail: anonim detail
+                      - room_uid: 2
                         created_at: 2022-02-15T02:18:32.857Z
                         updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim2
-                        product_type: 2
+                        image: image
+                        rating: 4.9
                         price: 2000
-                        qty: 20
-                        description: anonim description 2
-  /product/all/{id}:
+                        description: anonim detail 2
+  /product/all/{room_uid}:
     get:
       tags:
-        - all product
-      summary: get single product by id
-      description: wacth single product by parsing by id
+        - all rooms
+      summary: get single room by room_uid
+      description: wacth single room by parsing by room_uid
       responses:
         '500':
-          description: internal server error in get single product
+          description: internal server error in get single room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get single product
+                message: error internal server error for get single room
                 data:
         '200':
-          description: success get single product
+          description: success get single room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success get single product
+                message: success get single room
                 data:
-                  id: 1
+                  room_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim
-                  product_type: 1
-                  price: 1000
-                  qty: 10
-                  description: anonim description
-  /product/me:
+                  name: anonim2
+                  image: [
+                          image1,
+                          image2,
+                        ]
+                  rating: 4.9
+                  price: 2000
+                  description: anonim detail 2
+                  availability: true
+  /room/me/:
     post:
       tags:
-        - my product
-      summary: create product
-      description: user can create product and parsing user_id by jwt
+        - my rooms
+      summary: create room
+      description: user can create room and parsing user_uid by jwt
       requestBody:
         required: true
         content:
@@ -344,67 +348,63 @@ paths:
               $ref: '#/components/schemas/productRequest'
             example:
               name: anonim
-              product_type: 1
-              price: 1000
-              qty: 10
-              description: anonim description
+              location_city: malang
+              price: 20000
+              capacity: 10
+              detail: anonim detail
       responses:
         '400':
-          description: bad request in create product
+          description: bad request in create new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 400
-                message: error in request for create product
+                message: error in request for create new room
                 data:
         '500':
-          description: internal server error in create product
+          description: internal server error in create new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create product
+                message: error internal server error for create new room
                 data:
         '200':
-          description: success create product
+          description: success create new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success create product
+                message: success create new room
                 data: 
                   id: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
-                  product_type: 1
-                  price: 1000
-                  qty: 10
-                  description: anonim description
     get:
       tags:
-        - my product
-      summary: get all user's products 
-      description: user can wacth their products and parsing user_id by jwt
+        - my rooms
+      summary: get all user's rooms 
+      description: user can wacth their rooms and parsing user_uid by jwt
       responses:
         '500':
-          description: internal server error in get all user's products
+          description: internal server error in get all user's rooms
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get user's products
+                message: error internal server for get user's room
                 data:
         '200':
-          description: success get all user's products
+          description: success get all user's rooms
           content:
             application/json:
               schema:
@@ -415,68 +415,72 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all user's products
+                    example: success get all user's rooms
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/productDataResponse'
                     example:
-                      - id: 1
+                      - room_uid: 1
                         created_at: 2022-02-15T02:18:32.857Z
                         updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim
-                        product_type: 1
-                        price: 1000
-                        qty: 10
-                        description: anonim description
-                      - id: 2
+                        name: anonim1
+                        image: image
+                        rating: 4.9
+                        price: 2000
+                        description: anonim detail 1
+                      - room_uid: 2
                         created_at: 2022-02-15T02:18:32.857Z
                         updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim2
-                        product_type: 2
+                        image: image
+                        rating: 4.5
                         price: 2000
-                        qty: 20
-                        description: anonim description 2
-  /product/me/{id}:
+                        description: anonim detail 2
+  /room/me/{room_uid}:
     get:
       tags:
-        - my product
-      summary: get single user's product by id
-      description: user can wacth single user's product and parsing user_id by jwt
+        - my rooms
+      summary: get single user's room by room_uid
+      description: user can wacth single user's rooms and parsing user_uid by jwt
       responses:
         '500':
-          description: internal server error in get single user's product
+          description: internal server error in get single user's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get single user's product
+                message: error internal server error for get single user's room
                 data:
         '200':
-          description: success get single user's product
+          description: success get single user's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success get single user's product
+                message: success get single user's room
                 data:
-                  id: 1
+                  room_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim
-                  product_type: 1
-                  price: 1000
-                  qty: 10
-                  description: anonim description
+                  name: anonim2
+                  image: [
+                          image1,
+                          image2,
+                        ]
+                  rating: 4.9
+                  price: 2000
+                  description: anonim detail 2
+                  availability: true
     put:
       tags:
-        - my product
-      summary: update user's product
-      description: user can update their product with pasrsing by id and parsing user_id by jwt
+        - my rooms
+      summary: update single user's room
+      description: user can update their room with pasrsing by id and parsing user_id by jwt
       requestBody:
         required: true
         content:
@@ -484,83 +488,125 @@ paths:
             schema:
               $ref: '#/components/schemas/productRequest'
             example:
-              name: anonim update
-              product_type: 1
-              price: 1000
-              qty: 10
-              description: anonim description update
+              name: anonim
+              location_city: malang
+              price: 20000
+              capacity: 10
+              detail: anonim detail
       responses:
         '400':
-          description: bad request in update product
+          description: bad request in update room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 400
-                message: error in request for update product
+                message: error in request for update room
                 data:
         '500':
-          description: internal server in update product
+          description: internal server in update room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for update product
+                message: error internal server error for update room
                 data:
         '200':
-          description: success update product
+          description: success update room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success update product
+                message: success update room
                 data:
                   id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim update
-                  product_type: 1
-                  price: 1000
-                  qty: 10
-                  description: anonim description update
+                  created_at: "2022-02-15T02:18:32.857Z"
+                  updated_at: "2022-02-15T02:18:32.857Z"
+                  name: "anonim"
     delete:
       tags:
-        - my product
-      summary: delete product by id
-      description: user can delete their product and parsing user_id by jwt
+        - my rooms
+      summary: delete room by room_uid
+      description: user can delete their room and parsing user_id by jwt
       responses:
         '500':
-          description: internal server error in delete product
+          description: internal server error in delete room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for delete product
+                message: error internal server error for delete room
                 data:
         '200':
-          description: success delete product
+          description: success delete room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success delete product
+                message: success delete room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /cart/me:
+  /room/me/{room_uid}/image/upload:
     post:
       tags:
-        - cart
-      summary: create cart
-      description: user can add product to cart
+        - my rooms
+      summary: upload image for room
+      description: user can upload image and parsing user_uid by jwt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productRequest'
+            example:
+              image: image
+      responses:
+        '400':
+          description: bad request in upload image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 400
+                message: error in request for upload image
+                data:
+        '500':
+          description: internal server error in upload image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 500
+                message: error internal server error for upload image
+                data:
+        '200':
+          description: success upload image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 200
+                message: success upload image
+                data: 
+                  image: image1
+  /booking/me:
+    post:
+      tags:
+        - booking
+      summary: create booking
+      description: user can add room to booking
       requestBody:
         required: true
         content:
@@ -568,63 +614,63 @@ paths:
             schema: 
               $ref: '#/components/schemas/cartRequest'
             example:
-              product_id: 1
-              qty: 10
+              room_uid: 1
+              guest: 10
+              start_date: "2022-02-15T02:18:32.857Z"
+              end_date: "2022-02-15T02:18:32.857Z"
       responses:
         '400':
-          description: bad request in create cart
+          description: bad request in create new booking
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/cartHttpResponse'
               example:
                 code: 400
-                message: error in request for create cart
+                message: error in request for create booking
                 data:
         '500':
-          description: internal server error in create cart
+          description: internal server error in create booking
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/cartHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create cart
+                message: error internal server error for create booking
                 data:
         '200':
-          description: success create cart
+          description: success create booking
           content:
             application/json:
                 schema: 
                   $ref: '#/components/schemas/cartHttpResponse'
                 example:
                   code: 200
-                  message: success create cart
+                  message: success create booking
                   data:
                     id: 1
                     created_at: 2022-02-15T02:18:32.857Z
                     updated_at: 2022-02-15T02:18:32.857Z
-                    product_name: anonim
-                    qty: 10
-                    price: 10000
+                    room_uid: 1
     get:
       tags:
-        - cart
-      summary: get all products in cart
-      description: user can wacth their products which is on cart
+        - booking
+      summary: get all booking's room
+      description: user can wacth their booking's room
       responses:
         '500':
-          description: internal server in get all products in cart
+          description: internal server in get all booking's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get products in cart
+                message: error internal server for get booking's room
                 data:
         '200':
-          description: success get all products in cart
+          description: success get all booking's room
           content:
             application/json:
               schema:
@@ -635,50 +681,103 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all products in cart
+                    example: success get all booking's room
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/cartDataResponse'
                     example:
-                    - id: 1
+                    - booking_uid: 1
                       created_at: 2022-02-15T02:18:32.857Z
                       updated_at: 2022-02-15T02:18:32.857Z
-                      product_name: anonim 1
-                      qty: 10
+                      start_date: "2022-02-15T02:18:32.857Z"
+                      end_date: "2022-02-15T02:18:32.857Z"
+                      guest: 2
                       price: 1000
                     - id: 2
                       created_at: 2022-02-15T02:18:32.857Z
                       updated_at: 2022-02-15T02:18:32.857Z
-                      product_name: anonim 1
-                      qty: 20
-                      price: 20000
-  /cart/me/{id}:
+                      start_date: "2022-02-15T02:18:32.857Z"
+                      end_date: "2022-02-15T02:18:32.857Z"
+                      guest: 2
+                      price: 1000
+    put:
+      tags:
+        - booking
+      summary: update booking
+      description: user can update booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/cartRequest'
+            example:
+              room_uid: 1
+              guest: 10
+              start_date: "2022-02-15T02:18:32.857Z"
+              end_date: "2022-02-15T02:18:32.857Z"
+      responses:
+        '400':
+          description: bad request in update booking
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/cartHttpResponse'
+              example:
+                code: 400
+                message: error in request for update booking
+                data:
+        '500':
+          description: internal server error in update booking
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/cartHttpResponse'
+              example:
+                code: 500
+                message: error internal server error for update booking
+                data:
+        '200':
+          description: success update booking
+          content:
+            application/json:
+                schema: 
+                  $ref: '#/components/schemas/cartHttpResponse'
+                example:
+                  code: 200
+                  message: success update booking
+                  data:
+                    id: 1
+                    created_at: 2022-02-15T02:18:32.857Z
+                    updated_at: 2022-02-15T02:18:32.857Z
+                    room_uid: 1
+  /booking/me/{booking_id}:
     delete:
       tags:
-        - cart
-      summary: delete product in user's cart by id
-      description: user delete product in user's cart by id
+        - booking
+      summary: delete booking's room
+      description: user delete booking's room
       responses:
         '500':
-          description: internal server in delete product in cart
+          description: internal server in delete booking's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/cartHttpResponse'
               example:
                 code: 500
-                message: error internal server for delete product in cart
+                message: error internal server for delete booking's room
                 data:
         '200':
-          description: success delete product
+          description: success delete booking's room
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/cartHttpResponse'
               example:
                 code: 200
-                message: success delete product
+                message: success delete booking's room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
   /order/me/detail:
