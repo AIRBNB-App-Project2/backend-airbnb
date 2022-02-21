@@ -1,36 +1,47 @@
 package auth
 
-// type AuthController struct {
-// 	repo auth.Auth
-// }
+import (
+	"be/entities"
+	"be/repository/database/auth"
+	"net/http"
 
-// func New(repo auth.Auth) *AuthController {
-// 	return &AuthController{
-// 		repo: repo,
-// 	}
-// }
+	"be/delivery/controllers/templates"
+	"be/delivery/middlewares"
 
-// func (ac *AuthController) Login() echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		Userlogin := templates.Userlogin{}
+	"github.com/labstack/echo/v4"
+)
 
-// 		if err := c.Bind(&Userlogin); err != nil || Userlogin.Email == "" || Userlogin.Password == "" {
-// 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in request for login user", err))
-// 		}
-// 		checkedUser, err := ac.repo.Login(Userlogin)
+type AuthController struct {
+	repo auth.Auth
+}
 
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error for login user", err))
-// 		}
-// 		token, err := middewares.GenerateToken(checkedUser)
+func New(repo auth.Auth) *AuthController {
+	return &AuthController{
+		repo: repo,
+	}
+}
 
-// 		if err != nil {
-// 			return c.JSON(http.StatusNotAcceptable, templates.BadRequest(http.StatusNotAcceptable, "error in process token", err))
-// 		}
+func (ac *AuthController) Login() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		Userlogin := Userlogin{}
 
-// 		return c.JSON(http.StatusOK, templates.Success(nil, "success login", map[string]interface{}{
-// 			"data":  checkedUser,
-// 			"token": token,
-// 		}))
-// 	}
-// }
+		if err := c.Bind(&Userlogin); err != nil || Userlogin.Email == "" || Userlogin.Password == "" {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in request for login user", err))
+		}
+
+		checkedUser, err := ac.repo.Login(entities.User{Email: Userlogin.Email, Password: Userlogin.Password})
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error for login user", err))
+		}
+		token, err := middlewares.GenerateToken(checkedUser)
+
+		if err != nil {
+			return c.JSON(http.StatusNotAcceptable, templates.BadRequest(http.StatusNotAcceptable, "error in process token", err))
+		}
+
+		return c.JSON(http.StatusOK, templates.Success(nil, "success login", map[string]interface{}{
+			"token": token,
+		}))
+	}
+}

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"be/configs"
+	"be/entities"
 	"fmt"
 
 	"github.com/labstack/gommon/log"
@@ -31,5 +32,9 @@ func InitDB(config *configs.AppConfig) *gorm.DB {
 }
 
 func AutoMigrate(DB *gorm.DB) {
-
+	DB.AutoMigrate(&entities.User{})
+	DB.AutoMigrate(&entities.Room{})
+	DB.AutoMigrate(&entities.Image{})
+	DB.AutoMigrate(&entities.Booking{})
+	DB.AutoMigrate(&entities.Order{})
 }

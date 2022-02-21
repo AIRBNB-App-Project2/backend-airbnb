@@ -2,14 +2,33 @@ package main
 
 import (
 	"be/configs"
+	"be/delivery/controllers/auth"
+	"be/delivery/controllers/user"
+	"be/delivery/routes"
+	"fmt"
+	"log"
+
+	authLib "be/repository/database/auth"
+
+	userLib "be/repository/database/user"
 	"be/utils"
-	"github.com/lithammer/shortuuid"
-	"github.com/labstack/gommon/log"
+
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	config := configs.GetConfig()
 	db := utils.InitDB(config)
-	log.Info(db)
-	log.Info(shortuuid.New())
+
+	userRepo := userLib.New(db)
+	userController := user.New(userRepo)
+
+	authRepo := authLib.New(db)
+	authController := auth.New(authRepo)
+
+	e := echo.New()
+
+	routes.RoutesPath(e, userController, authController)
+
+	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
