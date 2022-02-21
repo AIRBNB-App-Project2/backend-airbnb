@@ -31,8 +31,8 @@ tags:
     description: checkout for the order
   - name: payment method
     description: payment method
-  - name: product type
-    description: product type
+  - name: cities
+    description: cities
 
 paths:
   /login:
@@ -820,8 +820,9 @@ paths:
             schema: 
               $ref: '#/components/schemas/orderRequest'
             example:
-              user_id: 1
-              payment_method_id: 1
+              booking_uid: 1
+              payment_method_uid: 1
+              name: "name anonimus"
       responses:
         '400':
           description: bad request in create order
@@ -856,7 +857,6 @@ paths:
                     id: 1
                     created_at: 2022-02-15T02:18:32.857Z
                     updated_at: 2022-02-15T02:18:32.857Z
-                    qty_total: 10
                     price_total: 10000
     get:
       tags:
@@ -887,7 +887,6 @@ paths:
                   id: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
-                  qty_total: 10
                   price_total: 10000
     delete:
       tags:
@@ -916,12 +915,12 @@ paths:
                 message: success delete order
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /product/type:
+  /cities:
     post:
       tags:
-        - product type
-      summary: create product type
-      description: create product type
+        - cities
+      summary: create post images room
+      description: create/upload images
       requestBody:
         required: true
         content:
@@ -932,57 +931,58 @@ paths:
               name: anonim type
       responses:
         '400':
-          description: bad request in create product type
+          description: bad request in create city
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 400
-                message: error in request for create product type
+                message: error in request for create city
                 data:
         '500':
-          description: internal server error in create product type
+          description: internal server error in create city
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create type
+                message: error internal server error for create city
                 data:
         '200':
-          description: success create product type
+          description: success create city
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 200
-                message: success create product type
+                message: success create city
                 data: 
                   id: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
+                  cities_uid: X2392X 
                   name: anonim type
     get:
       tags:
-        - product type
-      summary: get all product types
-      description: get all product types
+        - cities
+      summary: get all cities
+      description: get all cities
       responses:
         '500':
-          description: internal server error in get all product types
+          description: internal server error in get all cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 500
-                message: error internal server for get product types
+                message: error internal server for get cities
                 data:
         '200':
-          description: success get all product types
+          description: success get all cities
           content:
             application/json:
               schema:
@@ -993,7 +993,7 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all product types
+                    example: success get all cities
                   data:
                     type: array
                     items:
@@ -1007,12 +1007,12 @@ paths:
                         created_at: 2022-02-15T02:18:32.857Z
                         updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim2 type 2
-  /product/type/{id}:
+  /city/{id}:
     put:
       tags:
-        - product type
-      summary: update product type
-      description: update product type
+        - cities
+      summary: update cities
+      description: update cities
       requestBody:
         required: true
         content:
@@ -1023,34 +1023,34 @@ paths:
               name: anonim type update
       responses:
         '400':
-          description: bad request in update product type
+          description: bad request in update cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 400
-                message: error in request for update product type
+                message: error in request for update cities
                 data:
         '500':
-          description: internal server in update product type
+          description: internal server in update cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 500
-                message: error internal server error for update product type
+                message: error internal server error for update cities
                 data:
         '200':
-          description: success update product type
+          description: success update cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 200
-                message: success update product type
+                message: success update cities
                 data:
                   id: 1
                   created_at: 2022-02-15T02:18:32.857Z
@@ -1058,29 +1058,29 @@ paths:
                   name: anonim type update
     delete:
       tags:
-        - product type
-      summary: delete product type
-      description: delete product type
+        - cities
+      summary: delete cities
+      description: delete cities
       responses:
         '500':
-          description: internal server error in delete product type
+          description: internal server error in delete cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 500
-                message: error internal server error for delete product type
+                message: error internal server error for delete cities
                 data:
         '200':
-          description: success delete product type
+          description: success delete cities
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 200
-                message: success delete product type
+                message: success delete cities
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
   /payment/method:
