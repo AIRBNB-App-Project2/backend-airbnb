@@ -1,0 +1,19 @@
+services:
+  app:
+    build: .
+    environment:
+      PORT: 8000
+      DRIVER: "mysql"
+      ADDRESS: "database-1.cwyd99z6rnst.ap-southeast-1.rds.amazonaws.com"
+      DB_PORT: 3306
+      USERNAME: "admin"
+      PASSWORD: "adminadmin"
+      NAME: "airbnb"
+    restart: always
+    ports:
+      - 8081:8000
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9000:8080

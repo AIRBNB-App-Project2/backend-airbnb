@@ -21,3 +21,6 @@ jobs:
           echo ${{ secrets.USERNAME }}
           cd repo
           cd be
+          cd backend-airbnb
+          git pull origin main
+          docker-compose down --rmi all && docker-compose up --build -d
