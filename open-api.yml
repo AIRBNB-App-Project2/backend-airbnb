@@ -19,9 +19,7 @@ tags:
     description: login
   - name: user
     description: user
-  - name: custumer
-    description: access rooms for custumer
-  - name: owner
+  - name: room
     description: access rooms for owner
   - name: image
     description: post image
@@ -241,92 +239,6 @@ paths:
                 message: success delete user
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/all/{categories_id}/{city_id}:
-    get:
-      tags:
-        - custumer
-      summary: get all rooms in specific city and category
-      description: user can wacth all rooms in specific city and category
-      responses:
-        '500':
-          description: internal server error in get all rooms in specific city and category
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get all rooms in specific city and category
-                data:
-        '200':
-          description: success get all rooms in specific city and category
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all rooms in specific city and category
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/productDataResponse'
-                    example:
-                      name: city 1
-                      rooms:
-                        - room_uid: 1
-                          name: anonim
-                          image: image
-                          price: 1000
-                          detail: anonim detail
-                        - room_uid: 2
-                          name: anonim2
-                          image: image
-                          price: 2000
-                          description: anonim detail 2
-  /room/all/{room_uid}:
-    get:
-      tags:
-        - custumer
-      summary: get single room by room_uid
-      description: wacth single room by parsing by room_uid
-      responses:
-        '500':
-          description: internal server error in get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get single room
-                data:
-        '200':
-          description: success get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 200
-                message: success get single room
-                data:
-                  room_uid: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim2
-                  image: [
-                          image1,
-                          image2,
-                        ]
-                  address: address 1
-                  owner: owner name
-                  price: 2000
-                  description: anonim detail 2
   /city:
     get:
       tags:
@@ -369,7 +281,7 @@ paths:
   /room/owner/:
     post:
       tags:
-        - owner
+        - room
       summary: create room
       description: owner can create room and parsing user_uid by jwt
       requestBody:
@@ -415,11 +327,11 @@ paths:
                 code: 200
                 message: success add new room
                 data: 
-                  id: 1
+                  room_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
-  /room/owner/{city_id}/?category=premium:
+  /room/owner/{city_id}/?category=premium/?name=name:
     parameters:
       - in: path
         name: city_id
@@ -437,9 +349,17 @@ paths:
         example: 
           status: premium
         description: get the rooms by it category
+      - in: query
+        name: name
+        required: true
+        schema: 
+          type: string
+        example: 
+          status: name room
+        description: get the list room by name
     get:
       tags:
-        - owner
+        - room
       summary: get all owner's rooms 
       description: owner can wacth their rooms and parsing user_uid by jwt
       responses:
@@ -494,7 +414,7 @@ paths:
         description: get detail room by room_uid
     get:
       tags:
-        - owner
+        - room
       summary: get single owner's room by room_uid
       description: owner can wacth single owner's rooms and parsing user_uid by jwt
       responses:
@@ -543,7 +463,7 @@ paths:
                       status: end
     put:
       tags:
-        - owner
+        - room
       summary: update single owner's room
       description: owner can update their room with pasrsing by uid and parsing user_id by jwt
       requestBody:
@@ -596,7 +516,7 @@ paths:
                   name: "anonim"
     delete:
       tags:
-        - owner
+        - room
       summary: delete room by room_uid
       description: owner can delete their room and parsing user_id by jwt
       responses:
