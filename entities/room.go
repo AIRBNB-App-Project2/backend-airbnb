@@ -9,7 +9,6 @@ type Room struct {
 	City_id  string
 	Name     string
 	Rating   int `gorm:"type:TINYINT"`
-	Capacity int
 	Price    int
 	Detail   string
 	Images   []Image   `gorm:"foreignKey:Room_uid;references:Room_uid"`

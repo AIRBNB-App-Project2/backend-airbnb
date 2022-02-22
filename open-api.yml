@@ -238,25 +238,25 @@ paths:
                 message: success delete user
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/all:
+  /room/all/{categories_id}/{city_id}:
     get:
       tags:
         - all rooms
-      summary: get all rooms
-      description: user can wacth all rooms
+      summary: get all rooms in specific city and category
+      description: user can wacth all rooms in specific city and category
       responses:
         '500':
-          description: internal server error in get all rooms
+          description: internal server error in get all rooms in specific city and category
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get all rooms
+                message: error internal server error for get all rooms in specific city and category
                 data:
         '200':
-          description: success get all rooms
+          description: success get all rooms in specific city and category
           content:
             application/json:
               schema:
@@ -267,58 +267,7 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all rooms
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/productDataResponse'
-                    example:
-                      - room_uid: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim
-                        image: image
-                        rating: 4.5
-                        price: 1000
-                        detail: anonim detail
-                      - room_uid: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2
-                        image: image
-                        rating: 4.9
-                        price: 2000
-                        description: anonim detail 2
-  /room/all/{city_id}:
-    get:
-      tags:
-        - all rooms
-      summary: get all rooms in specific city
-      description: user can wacth all rooms in specific city
-      responses:
-        '500':
-          description: internal server error in get all rooms in specific city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get all rooms in specific city
-                data:
-        '200':
-          description: success get all rooms in specific city
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all rooms in specific city
+                    example: success get all rooms in specific city and category
                   data:
                     type: array
                     items:
@@ -327,22 +276,16 @@ paths:
                       name: city 1
                       rooms:
                         - room_uid: 1
-                          created_at: 2022-02-15T02:18:32.857Z
-                          updated_at: 2022-02-15T02:18:32.857Z
                           name: anonim
                           image: image
-                          rating: 4.5
                           price: 1000
                           detail: anonim detail
                         - room_uid: 2
-                          created_at: 2022-02-15T02:18:32.857Z
-                          updated_at: 2022-02-15T02:18:32.857Z
                           name: anonim2
                           image: image
-                          rating: 4.9
                           price: 2000
                           description: anonim detail 2
-  /product/all/{room_uid}:
+  /room/all/{room_uid}:
     get:
       tags:
         - all rooms
@@ -377,10 +320,10 @@ paths:
                           image1,
                           image2,
                         ]
-                  rating: 4.9
+                  address: address 1
+                  owner: owner name
                   price: 2000
                   description: anonim detail 2
-                  availability: true
   /city:
     get:
       tags:
@@ -508,19 +451,13 @@ paths:
                       $ref: '#/components/schemas/productDataResponse'
                     example:
                       - room_uid: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim1
                         image: image
-                        rating: 4.9
                         price: 2000
                         description: anonim detail 1
                       - room_uid: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
                         name: anonim2
                         image: image
-                        rating: 4.5
                         price: 2000
                         description: anonim detail 2
   /room/me/{room_uid}:
@@ -558,6 +495,8 @@ paths:
                           image1,
                           image2,
                         ]
+                  address: address 1
+                  owner: owner name
                   rating: 4.9
                   price: 2000
                   description: anonim detail 2
@@ -746,7 +685,6 @@ paths:
               $ref: '#/components/schemas/cartRequest'
             example:
               room_uid: 1
-              guest: 10
               start_date: "2022-02-15T02:18:32.857Z"
               end_date: "2022-02-15T02:18:32.857Z"
       responses:
@@ -823,14 +761,13 @@ paths:
                       updated_at: 2022-02-15T02:18:32.857Z
                       start_date: "2022-02-15T02:18:32.857Z"
                       end_date: "2022-02-15T02:18:32.857Z"
-                      guest: 2
                       price: 1000
+                      
                     - id: 2
                       created_at: 2022-02-15T02:18:32.857Z
                       updated_at: 2022-02-15T02:18:32.857Z
                       start_date: "2022-02-15T02:18:32.857Z"
                       end_date: "2022-02-15T02:18:32.857Z"
-                      guest: 2
                       price: 1000
     put:
       tags:
