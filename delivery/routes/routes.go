@@ -4,8 +4,8 @@ import (
 	"be/delivery/controllers/auth"
 	"be/delivery/controllers/user"
 
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController) {

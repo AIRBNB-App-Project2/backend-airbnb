@@ -1,6 +1,8 @@
 package templates
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Response struct {
 	Code    interface{} `json:"code"`
@@ -58,3 +60,5 @@ func BadRequest(code interface{}, msg interface{}, data interface{}) Response {
 		Data:    data,
 	}
 }
+
+//

@@ -26,8 +26,8 @@ func TestCreate(t *testing.T) {
 		res1, err1 := user.New(db).Create(mock1)
 		if err1 != nil {
 			t.Fatal()
+    }
 
-		}
 
 		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
 		res, err := repo.Create(mock2)

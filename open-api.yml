@@ -19,7 +19,7 @@ tags:
     description: login
   - name: user
     description: user
-  - name: room
+  - name: owner
     description: access rooms for owner
   - name: image
     description: post image
@@ -92,6 +92,7 @@ paths:
             example:
               name: anonim
               email: anonim@gmail.com
+              status: custumer or owner 
               password: anonim
       responses:
         '400':
@@ -102,7 +103,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 400
-                message: error bad request for create new user
+                message: [
+                           error name not empty,
+                           error password not empty
+                        ]
                 data:
         '500':
           description: internal server error in create user
@@ -112,7 +116,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create new user
+                message: [
+                            error email already used
+                ]
                 data:
         '200':
           description: success create user
@@ -128,8 +134,9 @@ paths:
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
+                  status: custumer or owner
                   email: anonim@gmail.com
-  /user/me:
+  /user/{id}:
     get:
       tags:
         - user
@@ -144,7 +151,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get user
+                message: [
+                  user not found
+                ]
                 data:
         '200':
           description: success get user
@@ -160,6 +169,7 @@ paths:
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
+                  status: custumer or owner
                   email: anonim@gmail.com
     put:
       tags:
@@ -195,7 +205,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for update user
+                message: [
+                  password is false,
+                  internal server error in update user
+                ]
                 data:
         '200':
           description: success update user
