@@ -7,7 +7,7 @@ import (
 
 type Booking struct {
 	gorm.Model
-	Booking_uid string
+	Booking_uid string	`gorm:"unique;type:varchar(22)"`
 	User_uid    string
 	Room_uid    string
 	Start_date  datatypes.Date
