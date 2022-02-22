@@ -37,5 +37,4 @@ func AutoMigrate(DB *gorm.DB) {
 	DB.AutoMigrate(&entities.Room{})
 	DB.AutoMigrate(&entities.Image{})
 	DB.AutoMigrate(&entities.Booking{})
-	DB.AutoMigrate(&entities.Order{})
 }

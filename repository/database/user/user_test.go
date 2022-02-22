@@ -18,7 +18,6 @@ func TestCreate(t *testing.T) {
 	db.Migrator().DropTable(&entities.Room{})
 	db.Migrator().DropTable(&entities.Image{})
 	db.Migrator().DropTable(&entities.Booking{})
-	db.Migrator().DropTable(&entities.Order{})
 	db.AutoMigrate(&entities.User{})
 
 	t.Run("success run create", func(t *testing.T) {

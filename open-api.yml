@@ -21,6 +21,8 @@ tags:
     description: user
   - name: owner
     description: access rooms for owner
+  - name: image
+    description: post image
   - name: city
     description: access city
   - name: booking
@@ -289,12 +291,12 @@ paths:
                         name: city 1
                       - id: 2
                         name: city 2
-  /room/me/:
+  /room/:
     post:
       tags:
-        - owner
+        - room
       summary: create room
-      description: user can create room and parsing user_uid by jwt
+      description: owner can create room and parsing user_uid by jwt
       requestBody:
         required: true
         content:
@@ -309,57 +311,83 @@ paths:
               detail: anonim detail
       responses:
         '400':
-          description: bad request in create new room
+          description: bad request in add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 400
-                message: error in request for create new room
+                message: error in request for add new room
                 data:
         '500':
-          description: internal server error in create new room
+          description: internal server error in add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create new room
+                message: error internal server error for add new room
                 data:
         '200':
-          description: success create new room
+          description: success add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success create new room
+                message: success add new room
                 data: 
-                  id: 1
+                  room_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
+  /room/{city_id}/?category=premium/?name=name:
+    parameters:
+      - in: path
+        name: city_id
+        required: true
+        schema: 
+          type: string
+        example:
+          city_id: 1
+        description: get the room's city by city id
+      - in: query
+        name: category
+        required: true
+        schema: 
+          type: string
+        example: 
+          status: premium
+        description: get the rooms by it category
+      - in: query
+        name: name
+        required: true
+        schema: 
+          type: string
+        example: 
+          status: name room
+        description: get the list room by name
     get:
       tags:
-        - owner
-      summary: get all user's rooms 
-      description: user can wacth their rooms and parsing user_uid by jwt
+        - room
+      summary: get all owner's rooms 
+      description: owner can wacth their rooms and parsing user_uid by jwt
       responses:
         '500':
-          description: internal server error in get all user's rooms
+          description: internal server error in get all owner's rooms
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get user's room
+                message: error internal server for get owner's room
                 data:
         '200':
-          description: success get all user's rooms
+          description: success get all owner's rooms
           content:
             application/json:
               schema:
@@ -370,7 +398,7 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all user's rooms
+                    example: success get all owner's rooms
                   data:
                     type: array
                     items:
@@ -381,37 +409,47 @@ paths:
                         image: image
                         price: 2000
                         description: anonim detail 1
+                        status: open
                       - room_uid: 2
                         name: anonim2
                         image: image
                         price: 2000
                         description: anonim detail 2
-  /room/me/{room_uid}:
+                        status: open
+  /room/{room_uid}:
+    parameters:
+      - in: path
+        name: room_uid
+        required: true
+        schema: 
+          type: string
+        example: fnsijni
+        description: get detail room by room_uid
     get:
       tags:
-        - owner
-      summary: get single user's room by room_uid
-      description: user can wacth single user's rooms and parsing user_uid by jwt
+        - room
+      summary: get single owner's room by room_uid
+      description: owner can wacth single owner's rooms and parsing user_uid by jwt
       responses:
         '500':
-          description: internal server error in get single user's room
+          description: internal server error in get single owner's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get single user's room
+                message: error internal server error for get single owner's room
                 data:
         '200':
-          description: success get single user's room
+          description: success get single owner's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success get single user's room
+                message: success get single owner's room
                 data:
                   room_uid: 1
                   created_at: 2022-02-15T02:18:32.857Z
@@ -426,12 +464,21 @@ paths:
                   rating: 4.9
                   price: 2000
                   description: anonim detail 2
-                  availability: true
+                  status: open
+                  booking: 
+                    - booking_uid: njasdnajn
+                      start_date: "2022-02-15T02:18:32.857Z"
+                      end_date: "2022-02-15T02:18:32.857Z"
+                      status: end
+                    - booking_uid: dsakjdna
+                      start_date: "2022-02-15T02:18:32.857Z"
+                      end_date: "2022-02-15T02:18:32.857Z"
+                      status: end
     put:
       tags:
-        - owner
-      summary: update single user's room
-      description: user can update their room with pasrsing by id and parsing user_id by jwt
+        - room
+      summary: update single owner's room
+      description: owner can update their room with pasrsing by uid and parsing user_id by jwt
       requestBody:
         required: true
         content:
@@ -444,6 +491,7 @@ paths:
               price: 20000
               capacity: 10
               detail: anonim detail
+              status: close
       responses:
         '400':
           description: bad request in update room
@@ -481,9 +529,9 @@ paths:
                   name: "anonim"
     delete:
       tags:
-        - owner
+        - room
       summary: delete room by room_uid
-      description: user can delete their room and parsing user_id by jwt
+      description: owner can delete their room and parsing user_id by jwt
       responses:
         '500':
           description: internal server error in delete room
@@ -506,10 +554,10 @@ paths:
                 message: success delete room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/me/{room_uid}/image:
+  /room/{room_uid}/image:
     post:
       tags:
-        - owner
+        - image
       summary: upload image for room
       description: user can upload image and parsing user_uid by jwt
       requestBody:
@@ -554,7 +602,7 @@ paths:
                 data: 
     delete:
       tags:
-        - owner
+        - image
       summary: delete images for room
       description: user can delete image and parsing user_uid by jwt
       requestBody:
@@ -597,7 +645,7 @@ paths:
                 code: 200
                 message: success delete image
                 data: 
-  /booking/me:
+  /booking:
     post:
       tags:
         - booking
@@ -648,6 +696,15 @@ paths:
                     created_at: 2022-02-15T02:18:32.857Z
                     updated_at: 2022-02-15T02:18:32.857Z
                     room_uid: 1
+  /booking/?status=onGoing:
+    parameters:
+      - in: query
+        name: status
+        schema:
+          type: string
+        example:
+          status: waiting, cancel, reservation, onGoing, end
+        description: to find booking by status
     get:
       tags:
         - booking
@@ -655,17 +712,17 @@ paths:
       description: user can wacth their booking's room
       responses:
         '500':
-          description: internal server in get all booking's room
+          description: internal server in get all booking's room by status
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get booking's room
+                message: error internal server for get booking's room by status
                 data:
         '200':
-          description: success get all booking's room
+          description: success get all booking's room by status
           content:
             application/json:
               schema:
@@ -676,7 +733,7 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all booking's room
+                    example: success get all booking's room by status
                   data:
                     type: array
                     items:
@@ -695,6 +752,14 @@ paths:
                       start_date: "2022-02-15T02:18:32.857Z"
                       end_date: "2022-02-15T02:18:32.857Z"
                       price: 1000
+  /booking/{booking_id}:
+    parameters:
+      - in: path
+        name: booking_id
+        required: true
+        schema: 
+          type: string
+        description: the uniq uid each booking
     put:
       tags:
         - booking
@@ -708,7 +773,6 @@ paths:
               $ref: '#/components/schemas/cartRequest'
             example:
               room_uid: 1
-              guest: 10
               start_date: "2022-02-15T02:18:32.857Z"
               end_date: "2022-02-15T02:18:32.857Z"
       responses:
@@ -746,7 +810,6 @@ paths:
                     created_at: 2022-02-15T02:18:32.857Z
                     updated_at: 2022-02-15T02:18:32.857Z
                     room_uid: 1
-  /booking/me/{booking_id}:
     delete:
       tags:
         - booking
