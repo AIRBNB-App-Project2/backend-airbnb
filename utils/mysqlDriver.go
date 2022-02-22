@@ -32,6 +32,7 @@ func InitDB(config *configs.AppConfig) *gorm.DB {
 }
 
 func AutoMigrate(DB *gorm.DB) {
+	DB.AutoMigrate(&entities.PaymentMethod{})
 	DB.AutoMigrate(&entities.User{})
 	DB.AutoMigrate(&entities.Room{})
 	DB.AutoMigrate(&entities.Image{})
