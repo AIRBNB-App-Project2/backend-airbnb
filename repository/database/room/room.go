@@ -41,3 +41,27 @@ func (repo *RoomDb) Create(room entities.Room) (entities.Room, error) {
 
 	return room, nil
 }
+
+func (repo *RoomDb) UpdateTranx(user_uid string, room_uid string,room entities.Room) (entities.Room, error) {
+	tx := repo.db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return entities.Room{}, err
+	}
+
+	resRoom1 := entities.Room{}
+
+	if err := tx.Model(&entities.Room{}).Where("user_id = ? AND room_uid = ?", user_uid, room_uid).Find(&resRoom1).Error ; err != nil {
+		tx.Rollback()
+		return entities.Room{}, err
+	}
+
+	// if res := tx.m
+
+}
