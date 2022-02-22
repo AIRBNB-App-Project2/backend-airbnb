@@ -6,12 +6,15 @@ import (
 	"be/repository/database/user"
 	"be/utils"
 	"testing"
+
+	"github.com/labstack/gommon/log"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate(t *testing.T) {
 	config := configs.GetConfig()
 	db := utils.InitDB(config)
-	// repo := New(db)
+	repo := New(db)
 	db.Migrator().DropTable(&entities.User{})
 	db.Migrator().DropTable(&entities.Room{})
 	db.Migrator().DropTable(&entities.Image{})
@@ -22,17 +25,17 @@ func TestCreate(t *testing.T) {
 	t.Run("success run create", func(t *testing.T) {
 		mock1 := entities.User{Name: "anonim1", Email: "anonim1", Password: "anonim1"}
 
-		res, err := user.New(db).Create(mock1)
-		if err != nil {
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
 			t.Fatal()
 
 		}
 
-		// mock2 := entities.Room{User_uid: 1}
-		// res, err := repo.Create(mock2)
-		// assert.Nil(t, err)
-		// assert.NotNil(t, res)
-		// log.Info(res)
+		mock2 := entities.Room{User_uid: res1.User_uid}
+		res, err := repo.Create(mock2)
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		log.Info(res)
 	})
 
 	// t.Run("fail run create", func(t *testing.T) {
