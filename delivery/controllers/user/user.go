@@ -6,6 +6,7 @@ import (
 	"be/repository/database/user"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,8 +23,13 @@ func New(repo user.User) *UserController {
 func (uc *UserController) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		newUser := UserRequest{}
-		if err := c.Bind(&newUser); err != nil || newUser.Email == "" || newUser.Password == "" {
+
+		if err := c.Bind(&newUser); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in request for create new user", err))
+		}
+		v := validator.New()
+		if err := v.Struct(newUser); err != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in request for create new user", nil))
 		}
 		res, err := uc.repo.Create(entities.User{Name: newUser.Name, Email: newUser.Email, Password: newUser.Password})
 

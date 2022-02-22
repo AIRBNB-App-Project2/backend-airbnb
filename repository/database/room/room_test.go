@@ -1,48 +1,48 @@
 package room
 
-import (
-	"be/configs"
-	"be/entities"
-	"be/repository/database/user"
-	"be/utils"
-	"testing"
-)
+// import (
+// 	"be/configs"
+// 	"be/entities"
+// 	"be/repository/database/user"
+// 	"be/utils"
+// 	"testing"
+// )
 
-func TestCreate(t *testing.T) {
-	config := configs.GetConfig()
-	db := utils.InitDB(config)
-	// repo := New(db)
-	db.Migrator().DropTable(&entities.User{})
-	db.Migrator().DropTable(&entities.Room{})
-	db.Migrator().DropTable(&entities.Image{})
-	db.Migrator().DropTable(&entities.Booking{})
-	db.Migrator().DropTable(&entities.Order{})
-	db.AutoMigrate(&entities.Room{})
+// func TestCreate(t *testing.T) {
+// 	config := configs.GetConfig()
+// 	db := utils.InitDB(config)
+// 	// repo := New(db)
+// 	db.Migrator().DropTable(&entities.User{})
+// 	db.Migrator().DropTable(&entities.Room{})
+// 	db.Migrator().DropTable(&entities.Image{})
+// 	db.Migrator().DropTable(&entities.Booking{})
+// 	db.Migrator().DropTable(&entities.Order{})
+// 	db.AutoMigrate(&entities.Room{})
 
-	t.Run("success run create", func(t *testing.T) {
-		mock1 := entities.User{Name: "anonim1", Email: "anonim1", Password: "anonim1"}
+// 	t.Run("success run create", func(t *testing.T) {
+// 		mock1 := entities.User{Name: "anonim1", Email: "anonim1", Password: "anonim1"}
 
-		res, err := user.New(db).Create(mock1)
-		if err != nil {
-			t.Fatal()
+// 		res, err := user.New(db).Create(mock1)
+// 		if err != nil {
+// 			t.Fatal()
 
-		}
+// 		}
 
-		// mock2 := entities.Room{User_uid: 1}
-		// res, err := repo.Create(mock2)
-		// assert.Nil(t, err)
-		// assert.NotNil(t, res)
-		// log.Info(res)
-	})
+// 		// mock2 := entities.Room{User_uid: 1}
+// 		// res, err := repo.Create(mock2)
+// 		// assert.Nil(t, err)
+// 		// assert.NotNil(t, res)
+// 		// log.Info(res)
+// 	})
 
-	// t.Run("fail run create", func(t *testing.T) {
-	// 	mockUser1 := entities.User{Name: "anonim2", Email: "anonim2", Password: "anonim2"}
-	// 	if _, err := repo.Create(mockUser1); err != nil {
-	// 		t.Fatal()
-	// 	}
-	// 	mockUser := entities.User{Name: "anonim2", Email: "anonim2", Password: "anonim2"}
-	// 	res, err := repo.Create(mockUser)
-	// 	assert.NotNil(t, err)
-	// 	assert.Equal(t, entities.User{}, res)
-	// })
-}
+// 	// t.Run("fail run create", func(t *testing.T) {
+// 	// 	mockUser1 := entities.User{Name: "anonim2", Email: "anonim2", Password: "anonim2"}
+// 	// 	if _, err := repo.Create(mockUser1); err != nil {
+// 	// 		t.Fatal()
+// 	// 	}
+// 	// 	mockUser := entities.User{Name: "anonim2", Email: "anonim2", Password: "anonim2"}
+// 	// 	res, err := repo.Create(mockUser)
+// 	// 	assert.NotNil(t, err)
+// 	// 	assert.Equal(t, entities.User{}, res)
+// 	// })
+// }

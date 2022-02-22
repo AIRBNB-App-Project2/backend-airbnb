@@ -2,6 +2,7 @@ package user
 
 import (
 	"be/entities"
+	"be/utils"
 	"errors"
 
 	"github.com/lithammer/shortuuid"
@@ -30,6 +31,7 @@ func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 			break
 		}
 	}
+	user.Password, _ = utils.HashPassword(user.Password)
 
 	user.User_uid = uid
 
@@ -39,16 +41,6 @@ func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 
 	return user, nil
 }
-func (repo *UserDb) GetAll() ([]entities.User, error) {
-	arrUser := []entities.User{}
-
-	if err := repo.db.Find(&arrUser).Error; err != nil {
-		return nil, err
-	}
-
-	return arrUser, nil
-}
-
 func (repo *UserDb) GetById(userId int) (entities.User, error) {
 	arrUser := entities.User{}
 
@@ -63,7 +55,7 @@ func (repo *UserDb) Update(userId int, newUser entities.User) (entities.User, er
 
 	var user entities.User
 	if err := repo.db.First(&user, userId); err != nil {
-		return entities.User{}, errors.New(" UserNot Found")
+		return entities.User{}, errors.New(" User Not Found")
 	}
 
 	if err := repo.db.Model(&user).Where("ID = ? ", userId).Updates(&newUser).Error; err != nil {
@@ -80,6 +72,7 @@ func (repo *UserDb) Delete(userId int) error {
 	if err := repo.db.First(&user, userId).Error; err != nil {
 		return err
 	}
+
 	repo.db.Delete(&user, userId)
 	return nil
 

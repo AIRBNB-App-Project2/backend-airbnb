@@ -19,8 +19,6 @@ tags:
     description: login
   - name: user
     description: user
-  - name: custumer
-    description: access rooms for custumer
   - name: owner
     description: access rooms for owner
   - name: city
@@ -92,6 +90,7 @@ paths:
             example:
               name: anonim
               email: anonim@gmail.com
+              status: custumer or owner 
               password: anonim
       responses:
         '400':
@@ -102,7 +101,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 400
-                message: error bad request for create new user
+                message: [
+                           error name not empty,
+                           error password not empty
+                        ]
                 data:
         '500':
           description: internal server error in create user
@@ -112,7 +114,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create new user
+                message: [
+                            error email already used
+                ]
                 data:
         '200':
           description: success create user
@@ -128,8 +132,9 @@ paths:
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
+                  status: custumer or owner
                   email: anonim@gmail.com
-  /user/me:
+  /user/{id}:
     get:
       tags:
         - user
@@ -144,7 +149,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get user
+                message: [
+                  user not found
+                ]
                 data:
         '200':
           description: success get user
@@ -160,6 +167,7 @@ paths:
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
+                  status: custumer or owner
                   email: anonim@gmail.com
     put:
       tags:
@@ -195,7 +203,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for update user
+                message: [
+                  password is false,
+                  internal server error in update user
+                ]
                 data:
         '200':
           description: success update user
@@ -239,92 +250,6 @@ paths:
                 message: success delete user
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/all/{categories_id}/{city_id}:
-    get:
-      tags:
-        - custumer
-      summary: get all rooms in specific city and category
-      description: user can wacth all rooms in specific city and category
-      responses:
-        '500':
-          description: internal server error in get all rooms in specific city and category
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get all rooms in specific city and category
-                data:
-        '200':
-          description: success get all rooms in specific city and category
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all rooms in specific city and category
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/productDataResponse'
-                    example:
-                      name: city 1
-                      rooms:
-                        - room_uid: 1
-                          name: anonim
-                          image: image
-                          price: 1000
-                          detail: anonim detail
-                        - room_uid: 2
-                          name: anonim2
-                          image: image
-                          price: 2000
-                          description: anonim detail 2
-  /room/all/{room_uid}:
-    get:
-      tags:
-        - custumer
-      summary: get single room by room_uid
-      description: wacth single room by parsing by room_uid
-      responses:
-        '500':
-          description: internal server error in get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get single room
-                data:
-        '200':
-          description: success get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 200
-                message: success get single room
-                data:
-                  room_uid: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim2
-                  image: [
-                          image1,
-                          image2,
-                        ]
-                  address: address 1
-                  owner: owner name
-                  price: 2000
-                  description: anonim detail 2
   /city:
     get:
       tags:
