@@ -12,6 +12,6 @@ type Booking struct {
 	Room_uid    string
 	Start_date  datatypes.Date
 	End_date    datatypes.Date
-	Status      string  `gorm:"type:enum('waiting', 'cancel', 'onGoing','end');default:'waiting'"`
+	Status      string  `gorm:"type:enum('waiting', 'cancel', 'reservation', 'onGoing','end');default:'waiting'"`
 	Orders      []Order `gorm:"foreignKey:Booking_uid;references:Booking_uid"`
 }
