@@ -27,10 +27,6 @@ tags:
     description: booking a room
   - name: order
     description: checkout for the order
-  - name: payment method
-    description: payment method
-  - name: cities
-    description: cities
 
 paths:
   /login:
@@ -293,6 +289,59 @@ paths:
                         rating: 4.9
                         price: 2000
                         description: anonim detail 2
+  /room/all/{city_id}:
+    get:
+      tags:
+        - all rooms
+      summary: get all rooms in specific city
+      description: user can wacth all rooms in specific city
+      responses:
+        '500':
+          description: internal server error in get all rooms in specific city
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 500
+                message: error internal server error for get all rooms in specific city
+                data:
+        '200':
+          description: success get all rooms in specific city
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: success get all rooms in specific city
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/productDataResponse'
+                    example:
+                      name: city 1
+                      rooms:
+                        - room_uid: 1
+                          created_at: 2022-02-15T02:18:32.857Z
+                          updated_at: 2022-02-15T02:18:32.857Z
+                          name: anonim
+                          image: image
+                          rating: 4.5
+                          price: 1000
+                          detail: anonim detail
+                        - room_uid: 2
+                          created_at: 2022-02-15T02:18:32.857Z
+                          updated_at: 2022-02-15T02:18:32.857Z
+                          name: anonim2
+                          image: image
+                          rating: 4.9
+                          price: 2000
+                          description: anonim detail 2
   /product/all/{room_uid}:
     get:
       tags:
@@ -332,6 +381,45 @@ paths:
                   price: 2000
                   description: anonim detail 2
                   availability: true
+  /city:
+    get:
+      tags:
+        - my rooms
+      summary: get all cities
+      description: get all cities
+      responses:
+        '500':
+          description: internal server error in get all cities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productTypeHttpResponse'
+              example:
+                code: 500
+                message: error internal server for get cities
+                data:
+        '200':
+          description: success get all cities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: success get all cities
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/productTypeHttpResponse'
+                    example:
+                      - id: 1
+                        name: city 1
+                      - id: 2
+                        name: city 2
   /room/me/:
     post:
       tags:
@@ -553,7 +641,7 @@ paths:
                 message: success delete room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/me/{room_uid}/image/upload:
+  /room/me/{room_uid}/image:
     post:
       tags:
         - my rooms
@@ -566,7 +654,8 @@ paths:
             schema:
               $ref: '#/components/schemas/productRequest'
             example:
-              image: image
+              - image: image1
+              - image: image2
       responses:
         '400':
           description: bad request in upload image
@@ -598,7 +687,51 @@ paths:
                 code: 200
                 message: success upload image
                 data: 
-                  image: image1
+    delete:
+      tags:
+        - my rooms
+      summary: delete images for room
+      description: user can delete image and parsing user_uid by jwt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productRequest'
+            example:
+              - image: image1
+              - image: image2
+      responses:
+        '400':
+          description: bad request in delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 400
+                message: error in request for delete image
+                data:
+        '500':
+          description: internal server error in delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 500
+                message: error internal server error for delete image
+                data:
+        '200':
+          description: success delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 200
+                message: success delete image
+                data: 
   /booking/me:
     post:
       tags:
@@ -793,7 +926,6 @@ paths:
             example:
               booking_uid: 1
               payment_method_uid: 1
-              name: "name anonimus"
       responses:
         '400':
           description: bad request in create order
@@ -886,343 +1018,6 @@ paths:
                 message: success delete order
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /cities:
-    post:
-      tags:
-        - cities
-      summary: create post images room
-      description: create/upload images
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/productTypeRequest'
-            example:
-              name: anonim type
-      responses:
-        '400':
-          description: bad request in create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 400
-                message: error in request for create city
-                data:
-        '500':
-          description: internal server error in create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create city
-                data:
-        '200':
-          description: success create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success create city
-                data: 
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  cities_uid: X2392X 
-                  name: anonim type
-    get:
-      tags:
-        - cities
-      summary: get all cities
-      description: get all cities
-      responses:
-        '500':
-          description: internal server error in get all cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get cities
-                data:
-        '200':
-          description: success get all cities
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all cities
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/productTypeHttpResponse'
-                    example:
-                      - id: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim type 1
-                      - id: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2 type 2
-  /city/{id}:
-    put:
-      tags:
-        - cities
-      summary: update cities
-      description: update cities
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/productTypeRequest'
-            example:
-              name: anonim type update
-      responses:
-        '400':
-          description: bad request in update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 400
-                message: error in request for update cities
-                data:
-        '500':
-          description: internal server in update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for update cities
-                data:
-        '200':
-          description: success update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success update cities
-                data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim type update
-    delete:
-      tags:
-        - cities
-      summary: delete cities
-      description: delete cities
-      responses:
-        '500':
-          description: internal server error in delete cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for delete cities
-                data:
-        '200':
-          description: success delete cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success delete cities
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-  /payment/method:
-    post:
-      tags:
-        - payment method
-      summary: create payment method
-      description: create payment method
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/paymentMethodRequest'
-            example:
-              name: anonim payment method
-      responses:
-        '400':
-          description: bad request in create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 400
-                message: error in request for create payment method
-                data:
-        '500':
-          description: internal server error in create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create payment method
-                data:
-        '200':
-          description: success create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success create payment method
-                data: 
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim payment method
-    get:
-      tags:
-        - payment method
-      summary: get all payment method
-      description: get all payment method
-      responses:
-        '500':
-          description: internal server error in get all payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get payment method
-                data:
-        '200':
-          description: success get all payment method
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all payment method
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/paymentMethodHttpResponse'
-                    example:
-                      - id: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim payment method 1
-                      - id: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2 payment method 2
-  /payment/method/{id}:
-    put:
-      tags:
-        - payment method
-      summary: update product payment method
-      description: update product payment method
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/paymentMethodRequest'
-            example:
-              name: anonim payment method update
-      responses:
-        '400':
-          description: bad request in update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 400
-                message: error in request for update payment method
-                data:
-        '500':
-          description: internal server in update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for update payment method
-                data:
-        '200':
-          description: success update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success update payment method
-                data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim payment method update
-    delete:
-      tags:
-        - payment method
-      summary: delete payment method
-      description: delete payment method
-      responses:
-        '500':
-          description: internal server error in delete payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for delete payment method
-                data:
-        '200':
-          description: success delete payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success delete payment method
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-
-
 
 
 

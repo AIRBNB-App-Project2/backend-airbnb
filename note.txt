@@ -23,3 +23,19 @@ id  uid name
 123 1 abc delete
 
 123 2 def
+
+
+{
+    name : city 1
+    
+    rooms :
+    
+    [
+        {
+            room 1
+        },
+        {
+            room 2
+        }
+    ]
+}

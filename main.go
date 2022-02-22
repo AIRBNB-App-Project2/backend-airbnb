@@ -6,7 +6,6 @@ import (
 	"be/delivery/controllers/user"
 	"be/delivery/routes"
 	"fmt"
-	"log"
 
 	authLib "be/repository/database/auth"
 
@@ -14,6 +13,7 @@ import (
 	"be/utils"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 func main() {
@@ -29,6 +29,5 @@ func main() {
 	e := echo.New()
 
 	routes.RoutesPath(e, userController, authController)
-
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
