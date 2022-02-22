@@ -278,7 +278,7 @@ paths:
                         name: city 1
                       - id: 2
                         name: city 2
-  /room/owner/:
+  /room/:
     post:
       tags:
         - room
@@ -331,7 +331,7 @@ paths:
                   created_at: 2022-02-15T02:18:32.857Z
                   updated_at: 2022-02-15T02:18:32.857Z
                   name: anonim
-  /room/owner/{city_id}/?category=premium/?name=name:
+  /room/{city_id}/?category=premium/?name=name:
     parameters:
       - in: path
         name: city_id
@@ -403,7 +403,7 @@ paths:
                         price: 2000
                         description: anonim detail 2
                         status: open
-  /room/owner/{room_uid}:
+  /room/{room_uid}:
     parameters:
       - in: path
         name: room_uid
@@ -541,7 +541,7 @@ paths:
                 message: success delete room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/owner/{room_uid}/image:
+  /room/{room_uid}/image:
     post:
       tags:
         - image
@@ -739,7 +739,7 @@ paths:
                       start_date: "2022-02-15T02:18:32.857Z"
                       end_date: "2022-02-15T02:18:32.857Z"
                       price: 1000
-  /booking/me/{booking_id}:
+  /booking/{booking_id}:
     parameters:
       - in: path
         name: booking_id
