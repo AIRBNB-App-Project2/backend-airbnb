@@ -2,7 +2,9 @@ package room
 
 import (
 	"be/entities"
+	"errors"
 
+	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
 	"gorm.io/gorm"
 )
@@ -42,7 +44,7 @@ func (repo *RoomDb) Create(room entities.Room) (entities.Room, error) {
 	return room, nil
 }
 
-func (repo *RoomDb) UpdateTranx(user_uid string, room_uid string,room entities.Room) (entities.Room, error) {
+func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Room) (entities.Room, error) {
 	tx := repo.db.Begin()
 
 	defer func() {
@@ -57,11 +59,32 @@ func (repo *RoomDb) UpdateTranx(user_uid string, room_uid string,room entities.R
 
 	resRoom1 := entities.Room{}
 
-	if err := tx.Model(&entities.Room{}).Where("user_id = ? AND room_uid = ?", user_uid, room_uid).Find(&resRoom1).Error ; err != nil {
+	if err := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Find(&resRoom1).Error; err != nil {
 		tx.Rollback()
 		return entities.Room{}, err
 	}
 
-	// if res := tx.m
+	if resRoom1.User_uid != user_uid {
+		tx.Rollback()
+		return entities.Room{}, errors.New(gorm.ErrInvalidData.Error())
+	}
 
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Delete(&resRoom1); res.RowsAffected == 0 {
+		log.Info(res.RowsAffected)
+		tx.Rollback()
+		return entities.Room{}, errors.New(gorm.ErrRecordNotFound.Error())
+	}
+	resRoom1.DeletedAt = gorm.DeletedAt{}
+	resRoom1.ID = 0
+	if res := tx.Create(&resRoom1); res.Error != nil {
+		tx.Rollback()
+		return entities.Room{}, res.Error
+	}
+
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Detail: upRoom.Detail}); res.Error != nil {
+		tx.Rollback()
+		return entities.Room{}, res.Error
+	}
+
+	return resRoom1, tx.Commit().Error
 }
