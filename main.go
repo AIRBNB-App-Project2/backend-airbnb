@@ -33,6 +33,6 @@ func main() {
 
 	e := echo.New()
 
-	routes.RoutesPath(e, userController, authController)
+	routes.RoutesPath(e, userController, authController, imageController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
