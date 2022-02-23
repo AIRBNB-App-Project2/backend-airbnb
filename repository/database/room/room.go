@@ -20,13 +20,13 @@ func New(db *gorm.DB) *RoomDb {
 }
 
 func (repo *RoomDb) Create(room entities.Room) (entities.Room, error) {
-
+	
 	var uid string
 
 	for {
 		uid = shortuuid.New()
 		find := entities.Room{}
-		res := repo.db.Model(&entities.Room{}).Where("room_uid = ?", uid).First(&find)
+		res := repo.db.Model(&entities.Room{}).Where("room_uid =  ?", uid).First(&find)
 		if res.RowsAffected == 0 {
 			break
 		}
@@ -88,3 +88,4 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 
 	return resRoom1, tx.Commit().Error
 }
+
