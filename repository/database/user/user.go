@@ -41,7 +41,8 @@ func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 
 	return user, nil
 }
-func (repo *UserDb) GetById(uid string) (entities.User, error) {
+
+func (repo *UserDb) GetById(uid string) (, error) {
 	user := entities.User{}
 
 	if err := repo.db.Where("user_uid =?", uid).First(&user); err != nil {
@@ -51,16 +52,49 @@ func (repo *UserDb) GetById(uid string) (entities.User, error) {
 	return user, nil
 }
 
-func (repo *UserDb) Update(userUid string, newUser entities.User) (entities.User, error) {
+func (repo *UserDb) Update(user_uid string, upUser entities.User) (entities.Room, error) {
+	tx := repo.db.Begin()
 
-	var user entities.User
-	fmt.Println(user)
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-	if err := repo.db.Model(&user).Where("user_uid = ? ", userUid).Updates(entities.User{Name: newUser.Name, Email: newUser.Email}).Error; err != nil {
-		return user, err
+	if err := tx.Error; err != nil {
+		return entities.Room{}, err
 	}
 
-	return user, nil
+	resRoom1 := entities.Room{}
+
+	if err := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Find(&resRoom1).Error; err != nil {
+		tx.Rollback()
+		return entities.Room{}, err
+	}
+
+	if resRoom1.User_uid != user_uid {
+		tx.Rollback()
+		return entities.Room{}, errors.New(gorm.ErrInvalidData.Error())
+	}
+
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Delete(&resRoom1); res.RowsAffected == 0 {
+		log.Info(res.RowsAffected)
+		tx.Rollback()
+		return entities.Room{}, errors.New(gorm.ErrRecordNotFound.Error())
+	}
+	resRoom1.DeletedAt = gorm.DeletedAt{}
+	resRoom1.ID = 0
+	if res := tx.Create(&resRoom1); res.Error != nil {
+		tx.Rollback()
+		return entities.Room{}, res.Error
+	}
+
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Detail: upRoom.Detail}); res.Error != nil {
+		tx.Rollback()
+		return entities.Room{}, res.Error
+	}
+
+	return resRoom1, tx.Commit().Error
 }
 
 func (repo *UserDb) Delete(userUid string) error {

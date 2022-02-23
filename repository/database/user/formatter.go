@@ -6,3 +6,9 @@ type UserCreateResponse struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type GetByIdResponse struct {
+	User_uid string `json:"user_uid"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+}
