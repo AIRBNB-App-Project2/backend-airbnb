@@ -88,9 +88,12 @@ func (uc *UserController) Update() echo.HandlerFunc {
 
 func (uc *UserController) Delete() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userUid := middlewares.ExtractTokenId(c)
-
-		if err := uc.repo.Delete(userUid); err != nil {
+		userUidParam := c.Param("uid")
+		userUidToken := middlewares.ExtractTokenId(c)
+		if userUidToken != userUidParam {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "sorry.. you are rejected", nil))
+		}
+		if err := uc.repo.Delete(userUidParam); err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server", nil))
 		}
 

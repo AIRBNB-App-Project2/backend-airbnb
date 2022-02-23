@@ -26,7 +26,7 @@ func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
 	for {
 		uid = shortuuid.New()
 		find := entities.Room{}
-		res := repo.db.Model(&entities.Room{}).Where("room_uid = ?", uid).First(&find)
+		res := repo.db.Model(&entities.Room{}).Where("room_uid =  ?", uid).First(&find)
 		if res.RowsAffected == 0 {
 			break
 		}

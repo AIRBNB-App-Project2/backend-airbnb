@@ -3,12 +3,14 @@ package main
 import (
 	"be/configs"
 	"be/delivery/controllers/auth"
+	"be/delivery/controllers/image"
 	"be/delivery/controllers/user"
 	"be/delivery/routes"
 	"fmt"
 
 	authLib "be/repository/database/auth"
 
+	imageLib "be/repository/database/image"
 	userLib "be/repository/database/user"
 	"be/utils"
 
@@ -26,8 +28,11 @@ func main() {
 	authRepo := authLib.New(db)
 	authController := auth.New(authRepo)
 
+	imageRepo := imageLib.New(db)
+	imageController := image.New(imageRepo)
+
 	e := echo.New()
 
-	routes.RoutesPath(e, userController, authController)
+	routes.RoutesPath(e, userController, authController, imageController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
