@@ -3,8 +3,9 @@ package user
 import (
 	"be/entities"
 	"be/utils"
-	"fmt"
+	"errors"
 
+	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
 	"gorm.io/gorm"
 )
@@ -41,36 +42,69 @@ func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 
 	return user, nil
 }
-func (repo *UserDb) GetById(uid string) (entities.User, error) {
-	user := entities.User{}
 
-	if err := repo.db.Where("user_uid =?", uid).First(&user); err != nil {
+func (repo *UserDb) GetById(user_uid string) (GetByIdResponse, error) {
+	user := GetByIdResponse{}
+
+	if err := repo.db.Model(&entities.User{}).Where("user_uid =?", user_uid).First(&user); err != nil {
 		return user, err.Error
 	}
 
 	return user, nil
 }
 
-func (repo *UserDb) Update(userUid string, newUser entities.User) (entities.User, error) {
+func (repo *UserDb) Update(user_uid string, upUser entities.User) (entities.User, error) {
+	tx := repo.db.Begin()
 
-	var user entities.User
-	fmt.Println(user)
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-	if err := repo.db.Model(&user).Where("user_uid = ? ", userUid).Updates(entities.User{Name: newUser.Name, Email: newUser.Email}).Error; err != nil {
-		return user, err
+	if err := tx.Error; err != nil {
+		return entities.User{}, err
 	}
 
-	return user, nil
+	resUser1 := entities.User{}
+
+	if err := tx.Model(&entities.User{}).Where("User_uid = ?", user_uid).Find(&resUser1).Error; err != nil {
+		tx.Rollback()
+		return entities.User{}, err
+	}
+
+	if resUser1.User_uid != user_uid {
+		tx.Rollback()
+		return entities.User{}, errors.New(gorm.ErrInvalidData.Error())
+	}
+
+	if res := tx.Model(&entities.User{}).Where("User_uid = ?", user_uid).Delete(&resUser1); res.RowsAffected == 0 {
+		log.Info(res.RowsAffected)
+		tx.Rollback()
+		return entities.User{}, errors.New(gorm.ErrRecordNotFound.Error())
+	}
+	resUser1.DeletedAt = gorm.DeletedAt{}
+	resUser1.ID = 0
+	if res := tx.Create(&resUser1); res.Error != nil {
+		tx.Rollback()
+		return entities.User{}, res.Error
+	}
+
+	if res := tx.Model(&entities.User{}).Where("User_uid = ?", user_uid).Updates(entities.User{Name: upUser.Name, Email: upUser.Email, Password: upUser.Password}); res.Error != nil {
+		tx.Rollback()
+		return entities.User{}, res.Error
+	}
+
+	return resUser1, tx.Commit().Error
 }
 
-func (repo *UserDb) Delete(userUid string) error {
+func (repo *UserDb) Delete(userUid string) (entities.User, error) {
 
 	var user entities.User
 
-	if err := repo.db.Where("user_uid =?", userUid).First(&user); err != nil {
-		return err.Error
+	if res := repo.db.Model(&entities.User{}).Where("user_uid =?", userUid).Delete(&user); res.Error != nil {
+		return user, res.Error
 	}
-	repo.db.Delete(&user, user.ID)
-	return nil
+	return user, nil
 
 }
