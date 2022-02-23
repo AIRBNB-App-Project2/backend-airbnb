@@ -12,5 +12,4 @@ type User struct {
 	Password string    `gorm:"not null;type:varchar(100)"`
 	Room     []Room    `gorm:"foreignKey:User_uid;references:User_uid"`
 	Bookings []Booking `gorm:"foreignKey:User_uid;references:User_uid"`
-
 }

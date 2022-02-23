@@ -28,14 +28,14 @@ func GenerateToken(u entities.User) (string, error) {
 	return token.SignedString([]byte(configs.JWT_SECRET))
 }
 
-func ExtractTokenId(e echo.Context) float64 {
+func ExtractTokenId(e echo.Context) string {
 	user := e.Get("user").(*jwt.Token) //convert to jwt token from interface
 	if user.Valid {
 		codes := user.Claims.(jwt.MapClaims)
-		id := codes["id"].(float64)
+		id := codes["id"].(string)
 		return id
 	}
-	return 0
+	return ""
 }
 
 func ExtractTokenAdmin(e echo.Context) (result string) {

@@ -2,6 +2,8 @@ package auth
 
 import (
 	"be/entities"
+	"be/utils"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -18,9 +20,10 @@ func New(db *gorm.DB) *AuthDb {
 
 func (ad *AuthDb) Login(UserLogin entities.User) (entities.User, error) {
 	user := entities.User{}
-	if err := ad.db.Model(&entities.User{}).Where("email = ? AND password = ?", UserLogin.Email, UserLogin.Password).First(&user).Error; err != nil {
-		return entities.User{}, err
-	}
+	ad.db.Model(entities.User{}).Where("email = ?", UserLogin.Email).First(&user)
 
+	if match := utils.CheckPasswordHash(UserLogin.Password, user.Password); !match {
+		return entities.User{}, errors.New("incorrect password")
+	}
 	return user, nil
 }
