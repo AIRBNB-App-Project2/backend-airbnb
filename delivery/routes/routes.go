@@ -19,11 +19,14 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 
 	e.POST("/login", ac.Login())
 	e.POST("/user", uc.Create())
-	e.GET("/user", uc.GetById(), middlewares.JwtMiddleware())
-	e.PUT("/user", uc.Update(), middlewares.JwtMiddleware())
-	e.DELETE("/user", uc.Delete(), middlewares.JwtMiddleware())
+
+
+	g := e.Group("", middlewares.JwtMiddleware())
+	g.GET("/user", uc.GetById(), middlewares.JwtMiddleware())
+	g.PUT("/user", uc.Update(), middlewares.JwtMiddleware())
+	g.DELETE("/user", uc.Delete(), middlewares.JwtMiddleware())
 
 	//Image
-	e.POST("/image", ic.Create())
+	g.POST("/image", ic.Create())
 
 }
