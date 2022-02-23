@@ -8,7 +8,6 @@ require (
 	github.com/go-playground/assert/v2 v2.0.1
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/labstack/gommon v0.3.1
 	github.com/lithammer/shortuuid v3.0.0+incompatible
@@ -20,9 +19,15 @@ require (
 )
 
 require (
+	github.com/labstack/echo v3.3.10+incompatible // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+)
+
+require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
