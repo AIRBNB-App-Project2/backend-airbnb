@@ -7,13 +7,13 @@ import (
 	"be/utils"
 	"net/http"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/gommon/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -38,7 +38,7 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		log.Info(file, src)
+		log.Info(src)
 
 		defer src.Close()
 
@@ -52,7 +52,7 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 
 		fileName, _ := utils.UploadFileToS3(s, src, file)
 
-		log.Info(fileName)
+		// log.Info(fileName)
 		// user := UserCreateRequest{}
 		image := entities.Image{}
 		image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName

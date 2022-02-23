@@ -4,17 +4,14 @@ sprint 2
 
 faliq
 
-- fix user repo
-- create room
-- update room
-- delete room
-- get city
+- user repo
+- city
 
 ade
 
 - fix user controller
 - get all room 
-- image
+- create room controller
 
 sprint 3
 

@@ -27,7 +27,7 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 	g.DELETE("/user", uc.Delete())
 
 	//Image
-	g.POST("/image", ic.Create())
+	e.POST("/image", ic.Create())
 
 	//City
 	g.GET("city", cc.GetAll())
