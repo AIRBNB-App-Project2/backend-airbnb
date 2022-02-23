@@ -1,7 +1,7 @@
 package room
 
 type Images struct {
-	Image string
+	Url string
 }
 
 type RoomGetByIdResp struct {
@@ -14,6 +14,7 @@ type RoomGetByIdResp struct {
 	Price       int      `json:"price"`
 	Description string   `json:"description"`
 	Status      string   `json:"status"`
+	Category    string   `json:"category"`
 }
 
 type RoomCreateResp struct {

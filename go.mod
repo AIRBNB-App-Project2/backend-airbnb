@@ -5,8 +5,10 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.43.4
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
+	github.com/go-playground/assert/v2 v2.0.1
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/labstack/gommon v0.3.1
 	github.com/lithammer/shortuuid v3.0.0+incompatible
@@ -16,6 +18,8 @@ require (
 	gorm.io/driver/mysql v1.3.2
 	gorm.io/gorm v1.23.1
 )
+
+require gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
