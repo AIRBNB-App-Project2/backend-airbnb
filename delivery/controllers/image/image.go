@@ -5,8 +5,9 @@ import (
 	"be/entities"
 	"be/repository/database/image"
 	"be/utils"
-	"fmt"
 	"net/http"
+
+	"github.com/labstack/gommon/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -37,6 +38,8 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
+		log.Info(file, src)
+
 		defer src.Close()
 
 		s, err := session.NewSession(&aws.Config{
@@ -49,9 +52,11 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 
 		fileName, _ := utils.UploadFileToS3(s, src, file)
 
-		fmt.Println(fileName)
+		log.Info(fileName)
 		// user := UserCreateRequest{}
 		image := entities.Image{}
+		image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName
+		log.Info(image.Url)
 
 		if err := c.Bind(&image); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
