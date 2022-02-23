@@ -41,7 +41,8 @@ func (ac *AuthController) Login() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(nil, "success login", map[string]interface{}{
-			"token": token,
+			"Name":  checkedUser.Name,
+			"Token": token,
 		}))
 	}
 }

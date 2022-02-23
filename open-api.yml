@@ -1,7 +1,7 @@
 openapi: '3.0.0'
 info:
-  title: e-commerce API
-  description: open api for e-commerce
+  title: airbnb
+  description: open api for airbnb
   contact:
     name: faliq adlan
     email: faliq67@gmail.com
@@ -19,20 +19,16 @@ tags:
     description: login
   - name: user
     description: user
-  - name: all rooms
-    description: access to all rooms
-  - name: my rooms
-    description: access to my rooms
+  - name: room
+    description: access rooms
+  - name: image
+    description: post image
+  - name: city
+    description: access city
   - name: booking
     description: booking a room
-  - name: order detail
-    description: cart which is fix
-  - name: order
-    description: checkout for the order
-  - name: payment method
-    description: payment method
-  - name: cities
-    description: cities
+  - name: payment
+    description: access payment
 
 paths:
   /login:
@@ -40,7 +36,7 @@ paths:
       tags:
         - login
       summary: login user
-      description: login user
+      description: login user endpont = http://18.140.1.124:8081/login
       requestBody: 
         required: true
         content:
@@ -81,13 +77,14 @@ paths:
                 code: 200
                 message: sucess login
                 data: 
+                  name: name user
                   token: secret
   /user:
     post:
       tags:
         - user
-      summary: registrasion for user
-      description: create user
+      summary: registrasion for user 
+      description: create user endpoint http://18.140.1.124:8081/user
       requestBody:
         required: true
         content:
@@ -107,7 +104,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 400
-                message: error bad request for create new user
+                message: [
+                           error name not empty,
+                           error password not empty
+                        ]
                 data:
         '500':
           description: internal server error in create user
@@ -117,7 +117,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create new user
+                message: [
+                            error email already used
+                ]
                 data:
         '200':
           description: success create user
@@ -128,13 +130,7 @@ paths:
               example:
                 code: 200
                 message: success create new user
-                data:
-                  user_uid: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim
-                  email: anonim@gmail.com
-  /user/me:
+                data: 
     get:
       tags:
         - user
@@ -149,7 +145,9 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get user
+                message: [
+                  user not found
+                ]
                 data:
         '200':
           description: success get user
@@ -161,11 +159,39 @@ paths:
                 code: 200
                 message: success get user
                 data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
+                  user_uid: 1
                   name: anonim
                   email: anonim@gmail.com
+                  rooms:
+                    - room_uid: dnsajndas
+                      name: name room
+                      description: room description
+                      price: 200000
+                      status: close
+                    - room_uid: dnsajndas
+                      name: name room2
+                      description: room description 2
+                      price: 200000
+                      status: open
+                  bookings:
+                    - booking_uid: njskndsan
+                      name: room name
+                      description: roop description
+                      start_date: 2022-02-15T02:18:32.857Z
+                      end_date: 2022-02-15T02:18:32.857Z
+                      price: 1000
+                      days: 2
+                      price_total: 2000
+                      status: reservation
+                    - booking_uid: sakmdksa
+                      name: room name 2
+                      description: room description 2
+                      start_date: 2022-02-15T02:18:32.857Z
+                      end_date: 2022-02-15T02:18:32.857Z
+                      price: 1000
+                      days: 2
+                      price_total: 2000
+                      status: reservation
     put:
       tags:
         - user
@@ -200,7 +226,10 @@ paths:
                 $ref: '#/components/schemas/userHttpResponse'
               example:
                 code: 500
-                message: error internal server error for update user
+                message: [
+                  password is false,
+                  internal server error in update user
+                ]
                 data:
         '200':
           description: success update user
@@ -244,25 +273,26 @@ paths:
                 message: success delete user
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/all:
+
+  /city:
     get:
       tags:
-        - all rooms
-      summary: get all rooms
-      description: user can wacth all rooms
+        - city
+      summary: get all cities
+      description: get all cities
       responses:
         '500':
-          description: internal server error in get all rooms
+          description: internal server error in get all cities
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/productHttpResponse'
+                $ref: '#/components/schemas/productTypeHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get all rooms
+                message: error internal server for get cities
                 data:
         '200':
-          description: success get all rooms
+          description: success get all cities
           content:
             application/json:
               schema:
@@ -273,73 +303,22 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all rooms
+                    example: success get all cities
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/productDataResponse'
+                      $ref: '#/components/schemas/productTypeHttpResponse'
                     example:
-                      - room_uid: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim
-                        image: image
-                        rating: 4.5
-                        price: 1000
-                        detail: anonim detail
-                      - room_uid: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2
-                        image: image
-                        rating: 4.9
-                        price: 2000
-                        description: anonim detail 2
-  /product/all/{room_uid}:
-    get:
-      tags:
-        - all rooms
-      summary: get single room by room_uid
-      description: wacth single room by parsing by room_uid
-      responses:
-        '500':
-          description: internal server error in get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for get single room
-                data:
-        '200':
-          description: success get single room
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productHttpResponse'
-              example:
-                code: 200
-                message: success get single room
-                data:
-                  room_uid: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim2
-                  image: [
-                          image1,
-                          image2,
-                        ]
-                  rating: 4.9
-                  price: 2000
-                  description: anonim detail 2
-                  availability: true
-  /room/me/:
+                      - id: 1
+                        name: city 1
+                      - id: 2
+                        name: city 2
+  /room:
     post:
       tags:
-        - my rooms
+        - room
       summary: create room
-      description: user can create room and parsing user_uid by jwt
+      description: owner can create room and parsing user_uid by jwt category list = standart, deluxe, superior, luxury
       requestBody:
         required: true
         content:
@@ -348,63 +327,110 @@ paths:
               $ref: '#/components/schemas/productRequest'
             example:
               name: anonim
-              location_city: malang
+              category: standart
+              address: address
+              city: city
               price: 20000
-              capacity: 10
-              detail: anonim detail
+              description: room description
       responses:
         '400':
-          description: bad request in create new room
+          description: bad request in add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 400
-                message: error in request for create new room
+                message: error in request for add new room
                 data:
         '500':
-          description: internal server error in create new room
+          description: internal server error in add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for create new room
+                message: error internal server error for add new room
                 data:
         '200':
-          description: success create new room
+          description: success add new room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success create new room
+                message: success add new room
                 data: 
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim
+                  room_uid: dsajdsabds
+                  name_user: nama user
+                  name_room: name room
+                  category: standart
+                  address: address
+                  city: city
+                  description: room description
+                  price: 20000
+  /room/{city_id}:
+    parameters:
+      - in: path
+        name: city_id
+        required: true
+        schema: 
+          type: string
+        example:
+          city_id: 1
+        description: get the room's city by city id
+      - in: query
+        name: category
+        required: true
+        schema: 
+          type: string
+        example: 
+          category: premium
+        description: get the rooms by it category
+      - in: query
+        name: name
+        required: true
+        schema: 
+          type: string
+        example: 
+          name: villa a
+        description: get the list room by name
+      - in: query
+        name: length
+        required: true
+        schema: 
+          type: integer
+        example: 
+          length: 10
+        description: get the list room by name
+      - in: query
+        name: status
+        required: true
+        schema: 
+          type: string
+        example: 
+          status: open
+        description: get the list room by name
     get:
       tags:
-        - my rooms
-      summary: get all user's rooms 
-      description: user can wacth their rooms and parsing user_uid by jwt
+        - room
+      summary: get list  rooms 
+      description: get list room's with query params /?category=standart/?name=name&?length=10&?status=open
       responses:
         '500':
-          description: internal server error in get all user's rooms
+          description: internal server error in get all owner's rooms
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get user's room
+                message: error internal server for get owner's room
                 data:
         '200':
-          description: success get all user's rooms
+          description: success get all owner's rooms
           content:
             application/json:
               schema:
@@ -415,72 +441,77 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all user's rooms
+                    example: success get all owner's rooms
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/productDataResponse'
                     example:
-                      - room_uid: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
+                      - room_uid: hvhvhjv
                         name: anonim1
                         image: image
-                        rating: 4.9
                         price: 2000
                         description: anonim detail 1
-                      - room_uid: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
+                        status: open
+                      - room_uid: hbjhbhb
                         name: anonim2
                         image: image
-                        rating: 4.5
                         price: 2000
                         description: anonim detail 2
-  /room/me/{room_uid}:
+                        status: open
+  /room/{room_uid}:
+    parameters:
+      - in: path
+        name: room_uid
+        required: true
+        schema: 
+          type: string
+        example: fnsijni
+        description: get detail room by room_uid
     get:
       tags:
-        - my rooms
-      summary: get single user's room by room_uid
-      description: user can wacth single user's rooms and parsing user_uid by jwt
+        - room
+      summary: get single owner's room by room_uid
+      description: owner can wacth single owner's rooms and parsing user_uid by jwt
       responses:
         '500':
-          description: internal server error in get single user's room
+          description: internal server error in get single owner's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server error for get single user's room
+                message: error internal server error for get single owner's room
                 data:
         '200':
-          description: success get single user's room
+          description: success get single owner's room
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 200
-                message: success get single user's room
+                message: success get single owner's room
                 data:
-                  room_uid: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim2
+                  room_uid: dsjkandskaj
+                  name: name room
                   image: [
                           image1,
                           image2,
                         ]
-                  rating: 4.9
+                  address: address 1
+                  owner_room: name owner
+                  city: malang
                   price: 2000
                   description: anonim detail 2
-                  availability: true
+                  status: open
+    
     put:
       tags:
-        - my rooms
-      summary: update single user's room
-      description: user can update their room with pasrsing by id and parsing user_id by jwt
+        - room
+      summary: update single owner's room
+      description: owner can update their room with pasrsing by uid and parsing user_id by jwt
       requestBody:
         required: true
         content:
@@ -493,6 +524,7 @@ paths:
               price: 20000
               capacity: 10
               detail: anonim detail
+              status: close
       responses:
         '400':
           description: bad request in update room
@@ -530,9 +562,9 @@ paths:
                   name: "anonim"
     delete:
       tags:
-        - my rooms
+        - room
       summary: delete room by room_uid
-      description: user can delete their room and parsing user_id by jwt
+      description: owner can delete their room and parsing user_id by jwt
       responses:
         '500':
           description: internal server error in delete room
@@ -555,10 +587,18 @@ paths:
                 message: success delete room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /room/me/{room_uid}/image/upload:
+  /room/{room_uid}/image:
+    parameters:
+      - in: path
+        name: room_uid
+        required: true
+        schema: 
+          type: string
+        example: fnsijni
+        description: get detail room by room_uid
     post:
       tags:
-        - my rooms
+        - image
       summary: upload image for room
       description: user can upload image and parsing user_uid by jwt
       requestBody:
@@ -568,7 +608,9 @@ paths:
             schema:
               $ref: '#/components/schemas/productRequest'
             example:
-              image: image
+              array:
+                - image: image1 , shown in list
+                - image: image2
       responses:
         '400':
           description: bad request in upload image
@@ -600,8 +642,53 @@ paths:
                 code: 200
                 message: success upload image
                 data: 
-                  image: image1
-  /booking/me:
+    put:
+      tags:
+        - image
+      summary: delete images for room
+      description: user can delete image and parsing user_uid by jwt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productRequest'
+            example:
+              array:
+                - id: 1
+                - id: 2
+      responses:
+        '400':
+          description: bad request in delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 400
+                message: error in request for delete image
+                data:
+        '500':
+          description: internal server error in delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 500
+                message: error internal server error for delete image
+                data:
+        '200':
+          description: success delete image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productHttpResponse'
+              example:
+                code: 200
+                message: success delete image
+                data: 
+  /booking:
     post:
       tags:
         - booking
@@ -614,8 +701,7 @@ paths:
             schema: 
               $ref: '#/components/schemas/cartRequest'
             example:
-              room_uid: 1
-              guest: 10
+              room_uid: vhvjvjh
               start_date: "2022-02-15T02:18:32.857Z"
               end_date: "2022-02-15T02:18:32.857Z"
       responses:
@@ -649,28 +735,33 @@ paths:
                   code: 200
                   message: success create booking
                   data:
-                    id: 1
-                    created_at: 2022-02-15T02:18:32.857Z
-                    updated_at: 2022-02-15T02:18:32.857Z
-                    room_uid: 1
+                    booking_uid: Nsafafsa
+                    name: name room
+                    description: room description
+                    start_date: "2022-02-15T02:18:32.857Z"
+                    end_date: "2022-02-15T02:18:32.857Z"
+                    price: 2000
+                    days: 2 
+                    price_total: 4000
+  /booking/{booking_id}:
     get:
       tags:
         - booking
-      summary: get all booking's room
+      summary: get  booking's detail
       description: user can wacth their booking's room
       responses:
         '500':
-          description: internal server in get all booking's room
+          description: internal server in get all booking's room by status
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/productHttpResponse'
               example:
                 code: 500
-                message: error internal server for get booking's room
+                message: error internal server for get booking's room by status
                 data:
         '200':
-          description: success get all booking's room
+          description: success get all booking's room by status
           content:
             application/json:
               schema:
@@ -681,26 +772,28 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: success get all booking's room
+                    example: success get all booking's room by status
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/cartDataResponse'
                     example:
-                    - booking_uid: 1
-                      created_at: 2022-02-15T02:18:32.857Z
-                      updated_at: 2022-02-15T02:18:32.857Z
+                      booking_uid: 1
+                      name: room name
+                      description: room description
                       start_date: "2022-02-15T02:18:32.857Z"
                       end_date: "2022-02-15T02:18:32.857Z"
-                      guest: 2
                       price: 1000
-                    - id: 2
-                      created_at: 2022-02-15T02:18:32.857Z
-                      updated_at: 2022-02-15T02:18:32.857Z
-                      start_date: "2022-02-15T02:18:32.857Z"
-                      end_date: "2022-02-15T02:18:32.857Z"
-                      guest: 2
-                      price: 1000
+                      days: 2
+                      price_total: 2000
+                      status:
+    parameters:
+      - in: path
+        name: booking_id
+        required: true
+        schema: 
+          type: string
+        description: the uniq uid each booking
     put:
       tags:
         - booking
@@ -713,8 +806,6 @@ paths:
             schema: 
               $ref: '#/components/schemas/cartRequest'
             example:
-              room_uid: 1
-              guest: 10
               start_date: "2022-02-15T02:18:32.857Z"
               end_date: "2022-02-15T02:18:32.857Z"
       responses:
@@ -748,11 +839,14 @@ paths:
                   code: 200
                   message: success update booking
                   data:
-                    id: 1
-                    created_at: 2022-02-15T02:18:32.857Z
-                    updated_at: 2022-02-15T02:18:32.857Z
-                    room_uid: 1
-  /booking/me/{booking_id}:
+                    booking_uid: Nsafafsa
+                    name: name room
+                    description: room description
+                    start_date: "2022-02-15T02:18:32.857Z"
+                    end_date: "2022-02-15T02:18:32.857Z"
+                    price: 2000
+                    days: 2 
+                    price_total: 4000
     delete:
       tags:
         - booking
@@ -780,579 +874,6 @@ paths:
                 message: success delete booking's room
                 data:
                   deleted_at: 2022-02-15T02:18:32.857Z
-  /order/me/detail:
-    post:
-      tags:
-        - order detail
-      summary: create order detail
-      description: user can add fix product to order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/orderDetailRequest'
-            example:
-              cart_id: 1
-              order_id: 1
-      responses:
-        '400':
-          description: bad request in create order detail
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderDetailHttpResponse'
-              example:
-                code: 400
-                message: error in request for create order detail
-                data:
-        '500':
-          description: internal server error in create order detail
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderDetailHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create order detail
-                data:
-        '200':
-          description: success create order detail
-          content:
-            application/json:
-                schema: 
-                  $ref: '#/components/schemas/orderDetailHttpResponse'
-                example:
-                  code: 200
-                  message: success create cart
-                  data:
-                    id: 1
-                    created_at: 2022-02-15T02:18:32.857Z
-                    updated_at: 2022-02-15T02:18:32.857Z
-                    product_name: anonim
-                    qty: 10
-                    price: 10000
-    get:
-      tags:
-        - order detail
-      summary: get all fix products in order detail
-      description: user can wacth their fix products which is on order detail
-      responses:
-        '500':
-          description: internal server in get all fix products in order detail
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/orderDetailHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get fix products in order detail
-                data:
-        '200':
-          description: success get all fix products in order detail
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all fix products in order detail
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/orderDetailHttpResponse'
-                    example:
-                    - id: 1
-                      created_at: 2022-02-15T02:18:32.857Z
-                      updated_at: 2022-02-15T02:18:32.857Z
-                      product_name: anonim 1
-                      qty: 10
-                      price: 1000
-                    - id: 2
-                      created_at: 2022-02-15T02:18:32.857Z
-                      updated_at: 2022-02-15T02:18:32.857Z
-                      product_name: anonim 1
-                      qty: 20
-                      price: 20000
-  /order/me/detail/{id}:
-    delete:
-      tags:
-        - order detail
-      summary: delete fix product in user's order detail by id
-      description: user delete fix product in user's order detail by id
-      responses:
-        '500':
-          description: internal server in delete product in order detail
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/orderDetailHttpResponse'
-              example:
-                code: 500
-                message: error internal server for delete product in order detail
-                data:
-        '200':
-          description: success delete product
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderDetailHttpResponse'
-              example:
-                code: 200
-                message: success delete product
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-  /order/me:
-    post:
-      tags:
-        - order
-      summary: create order
-      description: create checkout for order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              $ref: '#/components/schemas/orderRequest'
-            example:
-              booking_uid: 1
-              payment_method_uid: 1
-              name: "name anonimus"
-      responses:
-        '400':
-          description: bad request in create order
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 400
-                message: error in request for create order
-                data:
-        '500':
-          description: internal server error in create order
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create order
-                data:
-        '200':
-          description: success create order
-          content:
-            application/json:
-                schema: 
-                  $ref: '#/components/schemas/orderHttpResponse'
-                example:
-                  code: 200
-                  message: success create order
-                  data:
-                    id: 1
-                    created_at: 2022-02-15T02:18:32.857Z
-                    updated_at: 2022-02-15T02:18:32.857Z
-                    price_total: 10000
-    get:
-      tags:
-        - order
-      summary: get order
-      description: user can wacth their  order
-      responses:
-        '500':
-          description: internal server in get order
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get order
-                data:
-        '200':
-          description: success get order
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 500
-                message: success get order
-                data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  price_total: 10000
-    delete:
-      tags:
-        - order
-      summary: delete order
-      description: user delete order
-      responses:
-        '500':
-          description: internal server in delete order
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 500
-                message: error internal server for delete order
-                data:
-        '200':
-          description: success delete order
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/orderHttpResponse'
-              example:
-                code: 200
-                message: success delete order
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-  /cities:
-    post:
-      tags:
-        - cities
-      summary: create post images room
-      description: create/upload images
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/productTypeRequest'
-            example:
-              name: anonim type
-      responses:
-        '400':
-          description: bad request in create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 400
-                message: error in request for create city
-                data:
-        '500':
-          description: internal server error in create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create city
-                data:
-        '200':
-          description: success create city
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success create city
-                data: 
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  cities_uid: X2392X 
-                  name: anonim type
-    get:
-      tags:
-        - cities
-      summary: get all cities
-      description: get all cities
-      responses:
-        '500':
-          description: internal server error in get all cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get cities
-                data:
-        '200':
-          description: success get all cities
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all cities
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/productTypeHttpResponse'
-                    example:
-                      - id: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim type 1
-                      - id: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2 type 2
-  /city/{id}:
-    put:
-      tags:
-        - cities
-      summary: update cities
-      description: update cities
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/productTypeRequest'
-            example:
-              name: anonim type update
-      responses:
-        '400':
-          description: bad request in update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 400
-                message: error in request for update cities
-                data:
-        '500':
-          description: internal server in update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for update cities
-                data:
-        '200':
-          description: success update cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success update cities
-                data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim type update
-    delete:
-      tags:
-        - cities
-      summary: delete cities
-      description: delete cities
-      responses:
-        '500':
-          description: internal server error in delete cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for delete cities
-                data:
-        '200':
-          description: success delete cities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/productTypeHttpResponse'
-              example:
-                code: 200
-                message: success delete cities
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-  /payment/method:
-    post:
-      tags:
-        - payment method
-      summary: create payment method
-      description: create payment method
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/paymentMethodRequest'
-            example:
-              name: anonim payment method
-      responses:
-        '400':
-          description: bad request in create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 400
-                message: error in request for create payment method
-                data:
-        '500':
-          description: internal server error in create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for create payment method
-                data:
-        '200':
-          description: success create payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success create payment method
-                data: 
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim payment method
-    get:
-      tags:
-        - payment method
-      summary: get all payment method
-      description: get all payment method
-      responses:
-        '500':
-          description: internal server error in get all payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server for get payment method
-                data:
-        '200':
-          description: success get all payment method
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success get all payment method
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/paymentMethodHttpResponse'
-                    example:
-                      - id: 1
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim payment method 1
-                      - id: 2
-                        created_at: 2022-02-15T02:18:32.857Z
-                        updated_at: 2022-02-15T02:18:32.857Z
-                        name: anonim2 payment method 2
-  /payment/method/{id}:
-    put:
-      tags:
-        - payment method
-      summary: update product payment method
-      description: update product payment method
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/paymentMethodRequest'
-            example:
-              name: anonim payment method update
-      responses:
-        '400':
-          description: bad request in update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 400
-                message: error in request for update payment method
-                data:
-        '500':
-          description: internal server in update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for update payment method
-                data:
-        '200':
-          description: success update payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success update payment method
-                data:
-                  id: 1
-                  created_at: 2022-02-15T02:18:32.857Z
-                  updated_at: 2022-02-15T02:18:32.857Z
-                  name: anonim payment method update
-    delete:
-      tags:
-        - payment method
-      summary: delete payment method
-      description: delete payment method
-      responses:
-        '500':
-          description: internal server error in delete payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 500
-                message: error internal server error for delete payment method
-                data:
-        '200':
-          description: success delete payment method
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paymentMethodHttpResponse'
-              example:
-                code: 200
-                message: success delete payment method
-                data:
-                  deleted_at: 2022-02-15T02:18:32.857Z
-
-
-
-
 
 components:
   schemas:
@@ -1619,9 +1140,3 @@ components:
           type: string
         data:
           $ref: '#/components/schemas/paymentMethodDataResponse'
-
-
-
-
-
-

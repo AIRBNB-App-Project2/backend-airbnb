@@ -36,7 +36,7 @@ func initConfig() *AppConfig {
 	defaultConfig.Name = getEnv("NAME", "crud_api_test")
 	defaultConfig.Address = getEnv("ADDRESS", "localhost")
 	defaultConfig.DB_Port = 3306
-	defaultConfig.Username = getEnv("USERNAME", "root") 
+	defaultConfig.Username = getEnv("USERNAME", "root")
 	defaultConfig.Password = getEnv("PASSWORD", "root")
 
 	fmt.Println(defaultConfig)

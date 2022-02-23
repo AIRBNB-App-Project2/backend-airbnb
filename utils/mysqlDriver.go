@@ -32,9 +32,9 @@ func InitDB(config *configs.AppConfig) *gorm.DB {
 }
 
 func AutoMigrate(DB *gorm.DB) {
+	DB.Migrator().DropTable(&entities.User{})
 	DB.AutoMigrate(&entities.User{})
 	DB.AutoMigrate(&entities.Room{})
 	DB.AutoMigrate(&entities.Image{})
 	DB.AutoMigrate(&entities.Booking{})
-	DB.AutoMigrate(&entities.Order{})
 }
