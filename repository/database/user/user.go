@@ -3,7 +3,7 @@ package user
 import (
 	"be/entities"
 	"be/utils"
-	"errors"
+	"fmt"
 
 	"github.com/lithammer/shortuuid"
 	"gorm.io/gorm"
@@ -41,39 +41,36 @@ func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 
 	return user, nil
 }
-func (repo *UserDb) GetById(userId int) (entities.User, error) {
-	arrUser := entities.User{}
+func (repo *UserDb) GetById(uid string) (entities.User, error) {
+	user := entities.User{}
 
-	if err := repo.db.Where("ID = ?", userId).First(&arrUser); err != nil {
-		return arrUser, errors.New("User Not Found")
+	if err := repo.db.Where("user_uid =?", uid).First(&user); err != nil {
+		return user, err.Error
 	}
 
-	return arrUser, nil
+	return user, nil
 }
 
-func (repo *UserDb) Update(userId int, newUser entities.User) (entities.User, error) {
+func (repo *UserDb) Update(userUid string, newUser entities.User) (entities.User, error) {
 
 	var user entities.User
-	if err := repo.db.First(&user, userId); err != nil {
-		return entities.User{}, errors.New(" User Not Found")
-	}
+	fmt.Println(user)
 
-	if err := repo.db.Model(&user).Where("ID = ? ", userId).Updates(&newUser).Error; err != nil {
+	if err := repo.db.Model(&user).Where("user_uid = ? ", userUid).Updates(entities.User{Name: newUser.Name, Email: newUser.Email}).Error; err != nil {
 		return user, err
 	}
 
 	return user, nil
 }
 
-func (repo *UserDb) Delete(userId int) error {
+func (repo *UserDb) Delete(userUid string) error {
 
 	var user entities.User
 
-	if err := repo.db.First(&user, userId).Error; err != nil {
-		return err
+	if err := repo.db.Where("user_uid =?", userUid).First(&user); err != nil {
+		return err.Error
 	}
-
-	repo.db.Delete(&user, userId)
+	repo.db.Delete(&user, userUid)
 	return nil
 
 }
