@@ -7,6 +7,7 @@ import (
 	"be/utils"
 	"testing"
 
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,14 +27,13 @@ func TestCreate(t *testing.T) {
 		res1, err1 := user.New(db).Create(mock1)
 		if err1 != nil {
 			t.Fatal()
-    }
+		}
 
-
-		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 100, Name: "room1 name", Price: 100, Description: "room1 detail"}
 		res, err := repo.Create(mock2)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		// log.Info(res)
+		log.Info(res)
 	})
 }
 
@@ -53,12 +53,12 @@ func TestUpdate(t *testing.T) {
 		if err1 != nil {
 			t.Fatal()
 		}
-		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail"}
 		res2, err2 := repo.Create(mock2)
 		if err2 != nil {
 			t.Fatal()
 		}
-		mock3 := entities.Room{Name: "room3 name", Price: 300, Detail: "room3 detail"}
+		mock3 := entities.Room{Name: "room3 name", Price: 300, Description: "room3 detail"}
 		res, err := repo.Update(res1.User_uid, res2.Room_uid, mock3)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
