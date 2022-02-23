@@ -103,7 +103,7 @@ func (repo *UserDb) Delete(userUid string) error {
 	if err := repo.db.Where("user_uid =?", userUid).First(&user); err != nil {
 		return err.Error
 	}
-	repo.db.Delete(&user, userUid)
+	repo.db.Delete(&user, user.ID)
 	return nil
 
 }
