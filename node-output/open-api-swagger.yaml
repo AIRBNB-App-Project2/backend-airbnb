@@ -13,8 +13,8 @@
     "url" : "http://{environment}.shop/",
     "variables" : {
       "environment" : {
-        "default" : "dev",
-        "enum" : [ "dev", "prod" ]
+        "enum" : [ "dev", "prod" ],
+        "default" : "dev"
       }
     }
   } ],
