@@ -2,6 +2,7 @@ package routes
 
 import (
 	"be/delivery/controllers/auth"
+	"be/delivery/controllers/city"
 	"be/delivery/controllers/image"
 	"be/delivery/controllers/user"
 	"be/delivery/middlewares"
@@ -10,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, ic *image.ImageController) {
+func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, ic *image.ImageController, cc *city.CityController) {
 	e.Use(middleware.CORS())
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -20,13 +21,15 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 	e.POST("/login", ac.Login())
 	e.POST("/user", uc.Create())
 
-
 	g := e.Group("", middlewares.JwtMiddleware())
-	g.GET("/user", uc.GetById(), middlewares.JwtMiddleware())
-	g.PUT("/user", uc.Update(), middlewares.JwtMiddleware())
-	g.DELETE("/user", uc.Delete(), middlewares.JwtMiddleware())
+	g.GET("/user", uc.GetById())
+	g.PUT("/user", uc.Update())
+	g.DELETE("/user", uc.Delete())
 
 	//Image
 	g.POST("/image", ic.Create())
+
+	//City
+	g.GET("city", cc.GetAll())
 
 }
