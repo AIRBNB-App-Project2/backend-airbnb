@@ -83,8 +83,8 @@ paths:
     post:
       tags:
         - user
-      summary: registrasion for user endpoint http://18.140.1.124:8081/user
-      description: create user
+      summary: registrasion for user 
+      description: create user endpoint http://18.140.1.124:8081/user
       requestBody:
         required: true
         content:
