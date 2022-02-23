@@ -88,3 +88,32 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 
 	return resRoom1, tx.Commit().Error
 }
+
+func (repo *RoomDb) GetAll(city, category, name, length, status string) ([]entities.Room, error) {
+	var result []entities.Room
+	var query string = "SELECT * FROM rooms"
+	var orderBy string = ""
+	var limit string = ""
+
+	middle := ""
+	if city != "" {
+		query += "SELECT * FROM rooms WHERE city=" + city
+	}
+	if category != "" {
+		category += "category =" + category
+	}
+	if limit != "" {
+		limit += length
+	}
+	if category != "" && query != "" {
+		middle += "AND"
+	}
+
+	myQueries := query + middle + category + orderBy
+
+	if res := repo.db.Raw(myQueries).Find(&result); res.Error != nil {
+		return []entities.Room{}, res.Error
+	}
+
+	return result, nil
+}
