@@ -89,21 +89,36 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 	return resRoom1, tx.Commit().Error
 }
 
-func (repo *RoomDb) GetAll(city, category, name, length, status string) ([]entities.Room, error) {
+func (repo *RoomDb) GetAll(s, city, category, name, length, status string) ([]entities.Room, error) {
 	var result []entities.Room
-	var query string = "SELECT * FROM rooms"
+	var query string = "SELECT * FROM rooms "
 	var orderBy string = ""
 	var limit string = ""
 
+	if s != "" {
+		if city != "" {
+			city = "city_id = '" + city + "' AND "
+		}
+		myQueries := city + " name LIKE ?"
+		s = "%" + s + "%"
+		// fmt.Println("ssssssssssssss", myQueries, s)
+		if res := repo.db.Preload("Images").Preload("Bookings").Where(myQueries, s).Find(&result); res.Error != nil {
+			return []entities.Room{}, res.Error
+		}
+
+		return result, nil
+
+	}
+
 	middle := ""
 	if city != "" {
-		query += "SELECT * FROM rooms WHERE city=" + city
+		query = "SELECT * FROM rooms WHERE city_id=" + city
 	}
 	if category != "" {
 		category += "category =" + category
 	}
 	if limit != "" {
-		limit += length
+		limit += " LIMIT " + length
 	}
 	if category != "" && query != "" {
 		middle += "AND"

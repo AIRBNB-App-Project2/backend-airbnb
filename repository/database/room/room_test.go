@@ -7,6 +7,7 @@ import (
 	"be/utils"
 	"testing"
 
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -97,29 +98,42 @@ func TestGetAll(t *testing.T) {
 		city := "1"
 		var category string = ""
 		var name string = ""
-		var length string = ""
+		var length string = "10"
+		var s string = "xo"
 
 		var status string = ""
-		mockroom1 := entities.Room{User_uid: resu2.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
-		resroom1, errroom1 := repo.Create(mockroom1)
+		mockroom1 := entities.Room{User_uid: resu1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
+		_, errroom1 := repo.Create(mockroom1)
 		if errroom1 != nil {
 			t.Fatal()
 		}
-		mockroom2 := entities.Room{User_uid: "jkajhskjdsa", City_id: 2, Name: "room2 name", Price: 100, Detail: "room1 detail"}
-		resroom2, errroom2 := repo.Create(mockroom2)
+		mockroom2 := entities.Room{User_uid: resu2.User_uid, City_id: 1, Name: "roxoom2 name", Price: 100, Detail: "room2 detail"}
+		_, errroom2 := repo.Create(mockroom2)
 		if errroom2 != nil {
 			t.Fatal()
 		}
 
-		mockroom3 := entities.Room{User_uid: "jkajhskjdsa", City_id: 2, Name: "room3 name", Price: 100, Detail: "room1 detail"}
+		mockroom3 := entities.Room{User_uid: resu2.User_uid, City_id: 2, Name: "roxoxom3 name", Price: 100, Detail: "room1 detail"}
 		_, errroom3 := repo.Create(mockroom3)
 		if errroom3 != nil {
 			t.Fatal()
 		}
-		var mockAll []entities.Room
+		mockroom4 := entities.Room{User_uid: resu2.User_uid, City_id: 2, Name: "room3 name", Price: 100, Detail: "room1 detail"}
+		_, errroom4 := repo.Create(mockroom4)
+		if errroom4 != nil {
+			t.Fatal()
+		}
+		mockroom5 := entities.Room{User_uid: resu2.User_uid, City_id: 3, Name: "room3 name", Price: 100, Detail: "room1 detail"}
+		_, errroom5 := repo.Create(mockroom5)
+		if errroom5 != nil {
+			t.Fatal()
+		}
 
-		mockAll, _ = repo.GetAll(city, category, name, length, status)
-		assert.Equal(t, mock2.City_id, mockAll[1].City_id)
+		res, _ := repo.GetAll(s, city, category, name, length, status)
+		log.Info(res)
+
+		// assert.Equal(t, "0", res[0].ID)
+		assert.Equal(t, "roxoom2 name", res[0].Name)
 		// assert.Equal(t, res)
 		// log.Info(res)
 	})
