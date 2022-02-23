@@ -1,41 +1,20 @@
 yang tetap
 
-user
-login
+sprint 2
 
-diedit
-product ->  room faliq
-cart -> booking faliq
-order -> order ade
-product type -> cities ade
+faliq
 
-menambahkan
-image  ade
+- fix user repo
+- create room
+- update room
+- delete room
+- get city
 
-tetap
-payment method
+ade
 
+- fix user controller
+- get all room 
+- image
 
-id  uid name
-1   123 abc
+sprint 3
 
-
-123 1 abc delete
-
-123 2 def
-
-
-{
-    name : city 1
-    
-    rooms :
-    
-    [
-        {
-            room 1
-        },
-        {
-            room 2
-        }
-    ]
-}
