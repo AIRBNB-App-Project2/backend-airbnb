@@ -1,0 +1,1665 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "airbnb",
+    "description" : "open api for airbnb",
+    "contact" : {
+      "name" : "faliq adlan",
+      "email" : "faliq67@gmail.com"
+    },
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "http://{environment}.shop/",
+    "variables" : {
+      "environment" : {
+        "default" : "dev",
+        "enum" : [ "dev", "prod" ]
+      }
+    }
+  } ],
+  "tags" : [ {
+    "name" : "login",
+    "description" : "login"
+  }, {
+    "name" : "user",
+    "description" : "user"
+  }, {
+    "name" : "room",
+    "description" : "access rooms"
+  }, {
+    "name" : "image",
+    "description" : "post image"
+  }, {
+    "name" : "city",
+    "description" : "access city"
+  }, {
+    "name" : "booking",
+    "description" : "booking a room"
+  }, {
+    "name" : "payment",
+    "description" : "access payment"
+  } ],
+  "paths" : {
+    "/login" : {
+      "post" : {
+        "tags" : [ "login" ],
+        "summary" : "login user",
+        "description" : "login user endpont = http://18.140.1.124:8081/login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/loginRequest"
+              },
+              "example" : {
+                "email" : "anonim123",
+                "password" : "anonim123"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in login",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/loginHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error bad request for login"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in login",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/loginHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for login"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "sucess in login",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/loginHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "sucess login",
+                  "data" : {
+                    "name" : "name user",
+                    "token" : "secret"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "get user detail",
+        "description" : "user can get detail by parsing id with jwt",
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in get user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : [ "user not found" ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success get user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success get user",
+                  "data" : {
+                    "user_uid" : 1,
+                    "name" : "anonim",
+                    "email" : "anonim@gmail.com",
+                    "rooms" : [ {
+                      "room_uid" : "dnsajndas",
+                      "name" : "name room",
+                      "description" : "room description",
+                      "price" : 200000,
+                      "status" : "close"
+                    }, {
+                      "room_uid" : "dnsajndas",
+                      "name" : "name room2",
+                      "description" : "room description 2",
+                      "price" : 200000,
+                      "status" : "open"
+                    } ],
+                    "bookings" : [ {
+                      "booking_uid" : "njskndsan",
+                      "name" : "room name",
+                      "description" : "roop description",
+                      "start_date" : "2022-02-15T02:18:32.857+0000",
+                      "end_date" : "2022-02-15T02:18:32.857+0000",
+                      "price" : 1000,
+                      "days" : 2,
+                      "price_total" : 2000,
+                      "status" : "reservation"
+                    }, {
+                      "booking_uid" : "sakmdksa",
+                      "name" : "room name 2",
+                      "description" : "room description 2",
+                      "start_date" : "2022-02-15T02:18:32.857+0000",
+                      "end_date" : "2022-02-15T02:18:32.857+0000",
+                      "price" : 1000,
+                      "days" : 2,
+                      "price_total" : 2000,
+                      "status" : "reservation"
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "user" ],
+        "summary" : "update user",
+        "description" : "user can update by parsing id with jwt",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userRequest"
+              },
+              "example" : {
+                "name" : "anonim123",
+                "email" : "anonim123@gmail.com",
+                "password" : "anonim123"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in update user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for update user"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in update user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : [ "password is false", "internal server error in update user" ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success update user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success update user",
+                  "data" : {
+                    "id" : 1,
+                    "created_at" : "2022-02-15T02:18:32.857+0000",
+                    "updated_at" : "2022-02-15T02:18:32.857+0000",
+                    "name" : "anonim123",
+                    "email" : "anonim123@gmail.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "registrasion for user",
+        "description" : "create user endpoint http://18.140.1.124:8081/user",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userRequest"
+              },
+              "example" : {
+                "name" : "anonim",
+                "email" : "anonim@gmail.com",
+                "password" : "anonim"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in create user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : [ "error name not empty", "error password not empty" ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in create user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : [ "error email already used" ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success create user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success create new user"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "user" ],
+        "summary" : "delete user",
+        "description" : "user can get detail by parsing id with jwt",
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in delete user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for delete user"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success delete user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success delete user",
+                  "data" : {
+                    "deleted_at" : "2022-02-15T02:18:32.857+0000"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/city" : {
+      "get" : {
+        "tags" : [ "city" ],
+        "summary" : "get all cities",
+        "description" : "get all cities",
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in get all cities",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productTypeHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server for get cities"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success get all cities",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/room" : {
+      "post" : {
+        "tags" : [ "room" ],
+        "summary" : "create room",
+        "description" : "owner can create room and parsing user_uid by jwt category list = standart, deluxe, superior, luxury",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/productRequest"
+              },
+              "example" : {
+                "name" : "anonim",
+                "category" : "standart",
+                "address" : "address",
+                "city" : "city",
+                "price" : 20000,
+                "description" : "room description"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in add new room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for add new room"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in add new room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for add new room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success add new room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success add new room",
+                  "data" : {
+                    "room_uid" : "dsajdsabds",
+                    "name_user" : "nama user",
+                    "name_room" : "name room",
+                    "category" : "standart",
+                    "address" : "address",
+                    "city" : "city",
+                    "description" : "room description",
+                    "price" : 20000
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/room/{city_id}" : {
+      "get" : {
+        "tags" : [ "room" ],
+        "summary" : "get list  rooms",
+        "description" : "get list room's with query params /?category=standart/?name=name&?length=10&?status=open",
+        "parameters" : [ {
+          "name" : "city_id",
+          "in" : "path",
+          "description" : "get the room's city by city id",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : {
+            "city_id" : 1
+          }
+        }, {
+          "name" : "category",
+          "in" : "query",
+          "description" : "get the rooms by it category",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : {
+            "category" : "premium"
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "description" : "get the list room by name",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : {
+            "name" : "villa a"
+          }
+        }, {
+          "name" : "length",
+          "in" : "query",
+          "description" : "get the list room by name",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "example" : {
+            "length" : 10
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "get the list room by name",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : {
+            "status" : "open"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in get all owner's rooms",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server for get owner's room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success get all owner's rooms",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/room/{room_uid}" : {
+      "get" : {
+        "tags" : [ "room" ],
+        "summary" : "get single owner's room by room_uid",
+        "description" : "owner can wacth single owner's rooms and parsing user_uid by jwt",
+        "parameters" : [ {
+          "name" : "room_uid",
+          "in" : "path",
+          "description" : "get detail room by room_uid",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fnsijni"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in get single owner's room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for get single owner's room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success get single owner's room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success get single owner's room",
+                  "data" : {
+                    "room_uid" : "dsjkandskaj",
+                    "name" : "name room",
+                    "image" : [ "image1", "image2" ],
+                    "address" : "address 1",
+                    "owner_room" : "name owner",
+                    "city" : "malang",
+                    "price" : 2000,
+                    "description" : "anonim detail 2",
+                    "status" : "open"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "room" ],
+        "summary" : "update single owner's room",
+        "description" : "owner can update their room with pasrsing by uid and parsing user_id by jwt",
+        "parameters" : [ {
+          "name" : "room_uid",
+          "in" : "path",
+          "description" : "get detail room by room_uid",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fnsijni"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/productRequest"
+              },
+              "example" : {
+                "name" : "anonim",
+                "location_city" : "malang",
+                "price" : 20000,
+                "capacity" : 10,
+                "detail" : "anonim detail",
+                "status" : "close"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in update room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for update room"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server in update room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for update room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success update room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success update room",
+                  "data" : {
+                    "id" : 1,
+                    "created_at" : "2022-02-15T02:18:32.857Z",
+                    "updated_at" : "2022-02-15T02:18:32.857Z",
+                    "name" : "anonim"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "room" ],
+        "summary" : "delete room by room_uid",
+        "description" : "owner can delete their room and parsing user_id by jwt",
+        "parameters" : [ {
+          "name" : "room_uid",
+          "in" : "path",
+          "description" : "get detail room by room_uid",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fnsijni"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "internal server error in delete room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for delete room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success delete room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success delete room",
+                  "data" : {
+                    "deleted_at" : "2022-02-15T02:18:32.857+0000"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/room/{room_uid}/image" : {
+      "put" : {
+        "tags" : [ "image" ],
+        "summary" : "delete images for room",
+        "description" : "user can delete image and parsing user_uid by jwt",
+        "parameters" : [ {
+          "name" : "room_uid",
+          "in" : "path",
+          "description" : "get detail room by room_uid",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fnsijni"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/productRequest"
+              },
+              "example" : {
+                "array" : [ {
+                  "id" : 1
+                }, {
+                  "id" : 2
+                } ]
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in delete image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for delete image"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in delete image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for delete image"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success delete image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success delete image"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "image" ],
+        "summary" : "upload image for room",
+        "description" : "user can upload image and parsing user_uid by jwt",
+        "parameters" : [ {
+          "name" : "room_uid",
+          "in" : "path",
+          "description" : "get detail room by room_uid",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fnsijni"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/productRequest"
+              },
+              "example" : {
+                "array" : [ {
+                  "image" : "image1 , shown in list"
+                }, {
+                  "image" : "image2"
+                } ]
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in upload image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for upload image"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in upload image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for upload image"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success upload image",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success upload image"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/booking" : {
+      "post" : {
+        "tags" : [ "booking" ],
+        "summary" : "create booking",
+        "description" : "user can add room to booking",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/cartRequest"
+              },
+              "example" : {
+                "room_uid" : "vhvjvjh",
+                "start_date" : "2022-02-15T02:18:32.857Z",
+                "end_date" : "2022-02-15T02:18:32.857Z"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in create new booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for create booking"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in create booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for create booking"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success create booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success create booking",
+                  "data" : {
+                    "booking_uid" : "Nsafafsa",
+                    "name" : "name room",
+                    "description" : "room description",
+                    "start_date" : "2022-02-15T02:18:32.857Z",
+                    "end_date" : "2022-02-15T02:18:32.857Z",
+                    "price" : 2000,
+                    "days" : 2,
+                    "price_total" : 4000
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/booking/{booking_id}" : {
+      "get" : {
+        "tags" : [ "booking" ],
+        "summary" : "get  booking's detail",
+        "description" : "user can wacth their booking's room",
+        "parameters" : [ {
+          "name" : "booking_id",
+          "in" : "path",
+          "description" : "the uniq uid each booking",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "internal server in get all booking's room by status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/productHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server for get booking's room by status"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success get all booking's room by status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "booking" ],
+        "summary" : "update booking",
+        "description" : "user can update booking",
+        "parameters" : [ {
+          "name" : "booking_id",
+          "in" : "path",
+          "description" : "the uniq uid each booking",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/cartRequest"
+              },
+              "example" : {
+                "start_date" : "2022-02-15T02:18:32.857Z",
+                "end_date" : "2022-02-15T02:18:32.857Z"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "400" : {
+            "description" : "bad request in update booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 400,
+                  "message" : "error in request for update booking"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "internal server error in update booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server error for update booking"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success update booking",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success update booking",
+                  "data" : {
+                    "booking_uid" : "Nsafafsa",
+                    "name" : "name room",
+                    "description" : "room description",
+                    "start_date" : "2022-02-15T02:18:32.857Z",
+                    "end_date" : "2022-02-15T02:18:32.857Z",
+                    "price" : 2000,
+                    "days" : 2,
+                    "price_total" : 4000
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "booking" ],
+        "summary" : "delete booking's room",
+        "description" : "user delete booking's room",
+        "parameters" : [ {
+          "name" : "booking_id",
+          "in" : "path",
+          "description" : "the uniq uid each booking",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "internal server in delete booking's room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 500,
+                  "message" : "error internal server for delete booking's room"
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "success delete booking's room",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/cartHttpResponse"
+                },
+                "example" : {
+                  "code" : 200,
+                  "message" : "success delete booking's room",
+                  "data" : {
+                    "deleted_at" : "2022-02-15T02:18:32.857+0000"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "loginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "string"
+          },
+          "password" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        }
+      },
+      "loginDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          }
+        }
+      },
+      "loginHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/loginDataResponse"
+          }
+        }
+      },
+      "userRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          }
+        }
+      },
+      "userDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "name" : {
+            "type" : "string",
+            "format" : "string"
+          },
+          "email" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        }
+      },
+      "userHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/userDataResponse"
+          }
+        }
+      },
+      "productRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "product_type" : {
+            "type" : "integer"
+          },
+          "price" : {
+            "type" : "integer"
+          },
+          "qty" : {
+            "type" : "integer"
+          },
+          "description" : {
+            "type" : "string"
+          }
+        }
+      },
+      "productDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "name" : {
+            "type" : "string",
+            "format" : "string"
+          },
+          "product_type" : {
+            "type" : "integer"
+          },
+          "price" : {
+            "type" : "integer",
+            "format" : "int"
+          },
+          "qty" : {
+            "type" : "integer",
+            "format" : "int"
+          },
+          "description" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        }
+      },
+      "productHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/productDataResponse"
+          }
+        }
+      },
+      "cartRequest" : {
+        "type" : "object",
+        "properties" : {
+          "product_id" : {
+            "type" : "integer"
+          },
+          "qty" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "cartDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "product_name" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "price" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "cartHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/cartDataResponse"
+          }
+        }
+      },
+      "orderDetailRequest" : {
+        "type" : "object",
+        "properties" : {
+          "cart_id" : {
+            "type" : "integer"
+          },
+          "order_id" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "orderDetailDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "product_name" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "price" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "orderDetailHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/orderDetailDataResponse"
+          }
+        }
+      },
+      "orderRequest" : {
+        "type" : "object",
+        "properties" : {
+          "user_id" : {
+            "type" : "integer"
+          },
+          "payment_method_id" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "orderDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "qty_total" : {
+            "type" : "integer"
+          },
+          "price_total" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "orderHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/orderDataResponse"
+          }
+        }
+      },
+      "productTypeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "productTypeDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "productTypeHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/productTypeDataResponse"
+          }
+        }
+      },
+      "paymentMethodRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "paymentMethodDataResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "uint"
+          },
+          "created_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updated_at" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "paymentMethodHttpResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/paymentMethodDataResponse"
+          }
+        }
+      },
+      "inline_response_200" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "example" : 200
+          },
+          "message" : {
+            "type" : "string",
+            "example" : "success get all cities"
+          },
+          "data" : {
+            "type" : "array",
+            "example" : [ {
+              "id" : 1,
+              "name" : "city 1"
+            }, {
+              "id" : 2,
+              "name" : "city 2"
+            } ],
+            "items" : {
+              "$ref" : "#/components/schemas/productTypeHttpResponse"
+            }
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "example" : 200
+          },
+          "message" : {
+            "type" : "string",
+            "example" : "success get all owner's rooms"
+          },
+          "data" : {
+            "type" : "array",
+            "example" : [ {
+              "room_uid" : "hvhvhjv",
+              "name" : "anonim1",
+              "image" : "image",
+              "price" : 2000,
+              "description" : "anonim detail 1",
+              "status" : "open"
+            }, {
+              "room_uid" : "hbjhbhb",
+              "name" : "anonim2",
+              "image" : "image",
+              "price" : 2000,
+              "description" : "anonim detail 2",
+              "status" : "open"
+            } ],
+            "items" : {
+              "$ref" : "#/components/schemas/productDataResponse"
+            }
+          }
+        }
+      },
+      "inline_response_200_2" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "example" : 200
+          },
+          "message" : {
+            "type" : "string",
+            "example" : "success get all booking's room by status"
+          },
+          "data" : {
+            "type" : "array",
+            "example" : {
+              "booking_uid" : 1,
+              "name" : "room name",
+              "description" : "room description",
+              "start_date" : "2022-02-15T02:18:32.857Z",
+              "end_date" : "2022-02-15T02:18:32.857Z",
+              "price" : 1000,
+              "days" : 2,
+              "price_total" : 2000
+            },
+            "items" : {
+              "$ref" : "#/components/schemas/cartDataResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}
