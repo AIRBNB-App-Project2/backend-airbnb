@@ -31,7 +31,10 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 
 	// Room =============================
 
+	g.GET("/rooms", rc.GetAll())
 	g.GET("/room/:room_uid", rc.GetById())
+	g.POST("/room", rc.Create())
+	g.PUT("/room:room_uid", rc.Update())
 
 	//Image
 	e.POST("/image", ic.Create())

@@ -108,7 +108,6 @@ func (repo *RoomDb) GetAll(s, city, category, name, length, status string) ([]en
 		}
 		myQueries := city + " name LIKE ?"
 		s = "%" + s + "%"
-		// fmt.Println("ssssssssssssss", myQueries, s)
 		if res := repo.db.Preload("Images").Preload("Bookings").Where(myQueries, s).Find(&result); res.Error != nil {
 			return []entities.Room{}, res.Error
 		}
