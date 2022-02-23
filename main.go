@@ -11,11 +11,8 @@ import (
 	"fmt"
 
 	authLib "be/repository/database/auth"
-<<<<<<< HEAD
 	cityRep "be/repository/database/city"
 
-=======
->>>>>>> a7f259f2652a548168a6dee17ba2c5808919213d
 	imageLib "be/repository/database/image"
 	RoomRepo "be/repository/database/room"
 
@@ -39,20 +36,13 @@ func main() {
 	imageRepo := imageLib.New(db)
 	imageController := image.New(imageRepo)
 
-<<<<<<< HEAD
 	cityRepo := cityRep.New(db)
 	cityController := city.New(cityRepo)
 
-	e := echo.New()
-
-	routes.RoutesPath(e, userController, authController, imageController, cityController)
-=======
 	roomRepo := RoomRepo.New(db)
 	roomController := room.New(roomRepo)
-
 	e := echo.New()
 
-	routes.RoutesPath(e, userController, authController, imageController, roomController)
->>>>>>> a7f259f2652a548168a6dee17ba2c5808919213d
+	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }

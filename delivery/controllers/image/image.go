@@ -65,8 +65,8 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 		if err := v.Struct(image); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
 		}
-
-		res, err := ic.repo.Create(entities.Image{})
+		dajks := "kjdakdjakda"
+		res, err := ic.repo.Create(dajks, entities.Image{})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error fo create new image", err))
 		}
