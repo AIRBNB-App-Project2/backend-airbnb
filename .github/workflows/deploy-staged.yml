@@ -1,8 +1,7 @@
 name: Deploy
 on:
   pull_request:
-    types: 
-      - synchronize
+    types: [ assigned, opened, synchronize, reopened ]
     branches:
       - main
       

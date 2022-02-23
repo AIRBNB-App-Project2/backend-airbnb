@@ -4,7 +4,7 @@ import "be/entities"
 
 type User interface {
 	Create(user entities.User) (entities.User, error)
-	GetById(useruid string) (entities.User, error)
-	Update(userUid string, newUser entities.User) (entities.User, error)
-	Delete(userUid string) error
+	GetById(user_uid string) (GetByIdResponse, error)
+	Update(user_uid string, upUser entities.User) (entities.User, error)
+	Delete(userUid string) (entities.User, error)
 }

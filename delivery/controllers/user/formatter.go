@@ -11,8 +11,9 @@ type UserCreateRequest struct {
 	Password string `json:"password" form:"password" validate:"required"`
 }
 type UserUpdateRequest struct {
-	Name  string `json:"name" form:"name"`
-	Email string `json:"email" form:"email"`
+	Name     string `json:"name" form:"name"`
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
 //=======================================

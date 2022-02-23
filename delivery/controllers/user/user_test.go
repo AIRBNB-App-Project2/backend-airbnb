@@ -4,6 +4,7 @@ import (
 	"be/configs"
 	"be/delivery/controllers/auth"
 	"be/entities"
+	"be/repository/database/user"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -31,15 +32,15 @@ func (m *MockUserLib) Create(user entities.User) (entities.User, error) {
 	return entities.User{}, nil
 }
 
-func (m *MockUserLib) GetById(userUid string) (entities.User, error) {
-	return entities.User{}, nil
+func (m *MockUserLib) GetById(user_uid string) (user.GetByIdResponse, error) {
+	return user.GetByIdResponse{}, nil
 }
-func (m *MockUserLib) Update(userUid string, user entities.User) (entities.User, error) {
+func (m *MockUserLib) Update(user_uid string, upUser entities.User) (entities.User, error) {
 	return entities.User{}, nil
 }
 
-func (m *MockUserLib) Delete(userUid string) error {
-	return nil
+func (m *MockUserLib) Delete(userUid string) (entities.User, error) {
+	return entities.User{}, nil
 }
 
 ///MockFailUserLib
@@ -49,15 +50,15 @@ func (m *MockFailUserLib) Create(user entities.User) (entities.User, error) {
 	return entities.User{}, errors.New("")
 }
 
-func (m *MockFailUserLib) GetById(userUid string) (entities.User, error) {
+func (m *MockFailUserLib) GetById(user_uid string) (user.GetByIdResponse, error) {
+	return user.GetByIdResponse{}, errors.New("")
+}
+func (m *MockFailUserLib) Update(user_uid string, upUser entities.User) (entities.User, error) {
 	return entities.User{}, errors.New("")
 }
 
-func (m *MockFailUserLib) Update(userUid string, user entities.User) (entities.User, error) {
+func (m *MockFailUserLib) Delete(userUid string) (entities.User, error) {
 	return entities.User{}, errors.New("")
-}
-func (m *MockFailUserLib) Delete(userUid string) error {
-	return errors.New("")
 }
 
 ///END MOCK USER =======================================================
@@ -170,7 +171,7 @@ func TestGetById(t *testing.T) {
 		responses := auth.LoginRespFormat{}
 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-		jwtToken = responses.Data["Token"].(string)
+		jwtToken = responses.Data["token"].(string)
 		fmt.Println(jwtToken)
 		assert.Equal(t, responses.Message, "success login")
 	})
@@ -199,277 +200,115 @@ func TestGetById(t *testing.T) {
 		assert.Equal(t, "Success Get User", response.Message)
 
 	})
-	t.Run("ErorGetById", func(t *testing.T) {
+
+}
+
+func TestUpdate(t *testing.T) {
+
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
 		res := httptest.NewRecorder()
 
+		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
-		context.SetPath("/users/:id")
+		context.SetPath("/login")
 
-		falseUserController := New(&MockFailUserLib{})
-		falseUserController.GetById()(context)
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-		var response GetUserResponseFormat
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
+
+	t.Run("success Update", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/tasks/:uid")
+
+		taskController := New(&MockUserLib{})
+		// taskController.GetById()(context)
+		if err := m.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetUserResponseFormat{}
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-		assert.Equal(t, response.Message, "not found")
+
+		assert.Equal(t, 202, response.Code)
+
 	})
 
 }
 
-// func TestUserRegister(t *testing.T) {
-// 	t.Run("UserRegister", func(t *testing.T) {
-// 		e := echo.New()
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"nama":     "Adlan",
-// 			"email":    "adlan@adlan.com",
-// 			"password": "adlan123",
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+func TestDelete(t *testing.T) {
 
-// 		userController := New(MockUserRepository{})
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
+		e := echo.New()
 
-// 		userController.UserRegister()(context)
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
 
-// 		response := RegisterUserResponseFormat{}
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
+		res := httptest.NewRecorder()
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-// 		// assert.Equal(t, 201, response.Code)
-// 		assert.Equal(t, "Adlan", response.Data.Nama)
-// 		assert.Equal(t, http.StatusCreated, response.Code)
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 	})
-// 	t.Run("ErorUserRegister", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPost, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-// 		userController := New(&MockFalseUserRepository{})
-// 		userController.UserRegister()(context)
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-// 		response := RegisterUserResponseFormat{}
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+	t.Run("success run Delete", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/user")
 
-// 		assert.Equal(t, 500, response.Code)
-// 		assert.Equal(t, "There is some error on server", response.Message)
+		taskController := New(&MockUserLib{})
+		// taskController.GetById()(context)
+		if err := m.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 	})
+		response := GetUserResponseFormat{}
 
-// 	t.Run("UserRegisterBind", func(t *testing.T) {
-// 		e := echo.New()
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"nama":     "Adlan",
-// 			"email":    "adlan@adlan.com",
-// 			"password": 1,
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		userController := New(MockUserRepository{})
-// 		userController.UserRegister()(context)
+		assert.Equal(t, 200, response.Code)
 
-// 		response := RegisterUserResponseFormat{}
+	})
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 400, response.Code)
-
-// 	})
-
-// }
-
-// func TestUpdate(t *testing.T) {
-// 	t.Run("Update", func(t *testing.T) {
-// 		e := echo.New()
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"nama":     "Adlan",
-// 			"email":    "adlan@adlan.com",
-// 			"password": "adlan123",
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/:id")
-
-// 		userController := New(&MockUserRepository{})
-// 		userController.Update()(context)
-
-// 		response := UpdateResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 200, response.Code)
-// 		assert.Equal(t, "Adlan", response.Data.Nama)
-
-// 	})
-
-// 	t.Run("ErrorUpdate", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPut, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/:id")
-
-// 		userController := New(&MockFalseUserRepository{})
-// 		userController.Update()(context)
-
-// 		response := UpdateResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 500, response.Code)
-// 		assert.Equal(t, "There is some error on server", response.Message)
-
-// 	})
-// 	t.Run("UpdateBind", func(t *testing.T) {
-// 		e := echo.New()
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"nama":     "Adlan",
-// 			"email":    "adlan@adlan.com",
-// 			"password": 123,
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/:id")
-
-// 		userController := New(&MockUserRepository{})
-// 		userController.Update()(context)
-
-// 		response := UpdateResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 400, response.Code)
-
-// 	})
-// }
-
-// func TestDelete(t *testing.T) {
-// 	t.Run("DeleteUser", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodDelete, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/:id")
-
-// 		userController := New(&MockUserRepository{})
-// 		userController.Delete()(context)
-
-// 		response := DeleteResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 200, response.Code)
-// 		assert.Equal(t, nil, response.Data)
-
-// 	})
-
-// 	t.Run("ErrorDeleteUser", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodDelete, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/:id")
-
-// 		userController := New(&MockFalseUserRepository{})
-// 		userController.Delete()(context)
-
-// 		response := DeleteResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 500, response.Code)
-// 		assert.Equal(t, "There is some error on server", response.Message)
-
-// 	})
-// }
-
-//====================
-
-// func TestLogin(t *testing.T) {
-// 	t.Run("UserLogin", func(t *testing.T) {
-// 		e := echo.New()
-
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"email":    "adlan@adlan.com",
-// 			"password": "adlan123",
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/login")
-
-// 		userController := New(MockUserRepository{})
-// 		userController.Login()(context)
-
-// 		response := UserLoginResponseFormat{}
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-// 		fmt.Println(response)
-
-// 		assert.Equal(t, 200, response.Code)
-// 		assert.Equal(t, "adlan@adlan.com", response.Data.Email)
-
-// 	})
-
-// 	t.Run("ErrorLogin", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPost, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/login")
-
-// 		userController := New(&MockFalseUserRepository{})
-// 		userController.Login()(context)
-
-// 		response := UserLoginResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 400, response.Code)
-// 		assert.Equal(t, "There is some problem from input", response.Message)
-
-// 	})
-
-// 	t.Run("UserLoginBind", func(t *testing.T) {
-// 		e := echo.New()
-
-// 		requestBody, _ := json.Marshal(map[string]interface{}{
-// 			"email":    "adlan@adlan.com",
-// 			"password": 123,
-// 		})
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users/login")
-
-// 		userController := New(MockUserRepository{})
-// 		userController.Login()(context)
-
-// 		response := UserLoginResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 400, response.Code)
-
-// 	})
-// }
+}
