@@ -30,8 +30,9 @@ type BookingUserResp struct {
 }
 
 type GetByIdResponse struct {
-	User_uid string `json:"user_uid"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	
+	User_uid string            `json:"user_uid"`
+	Name     string            `json:"name"`
+	Email    string            `json:"email"`
+	Rooms    []RoomUserResp    `json:"rooms"`
+	Bookings []BookingUserResp `json:"bookings"`
 }

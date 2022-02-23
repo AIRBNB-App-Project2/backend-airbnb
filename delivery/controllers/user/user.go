@@ -46,13 +46,9 @@ func (uc *UserController) Create() echo.HandlerFunc {
 func (uc *UserController) GetById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		userUidParam := c.Param("uid")
 		userUidToken := middlewares.ExtractTokenId(c)
-		if userUidToken != userUidParam {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "sorry.. you are rejected", nil))
-		}
 
-		res, err := uc.repo.GetById(userUidParam)
+		res, err := uc.repo.GetById(userUidToken)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "User not found", nil))
@@ -64,11 +60,7 @@ func (uc *UserController) GetById() echo.HandlerFunc {
 
 func (uc *UserController) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userUidParam := c.Param("uid")
 		userUidToken := middlewares.ExtractTokenId(c)
-		if userUidToken != userUidParam {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "sorry.. you are rejected", nil))
-		}
 
 		var newUser = UserUpdateRequest{}
 
@@ -76,24 +68,21 @@ func (uc *UserController) Update() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(http.StatusBadRequest, "There is some problem from input", nil))
 		}
 
-		res, err := uc.repo.Update(userUidParam, entities.User{Name: newUser.Name, Email: newUser.Email})
+		res, err := uc.repo.Update(userUidToken, entities.User{Name: newUser.Name, Email: newUser.Email, Password: newUser.Password})
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Update User", res))
+		return c.JSON(http.StatusAccepted, templates.Success(http.StatusAccepted, "Success Update User", res))
 	}
 }
 
 func (uc *UserController) Delete() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userUidParam := c.Param("uid")
 		userUidToken := middlewares.ExtractTokenId(c)
-		if userUidToken != userUidParam {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "sorry.. you are rejected", nil))
-		}
-		if err := uc.repo.Delete(userUidParam); err != nil {
+
+		if _, err := uc.repo.Delete(userUidToken); err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server", nil))
 		}
 
