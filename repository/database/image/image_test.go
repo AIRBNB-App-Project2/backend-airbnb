@@ -28,7 +28,7 @@ package image
 // 	if err1 != nil {
 // 		t.Fatal()
 // 	}
-// 	mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
+// 	mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail"}
 // 	res2, err2 := room.New(db).Create(mock2)
 // 	if err2 != nil {
 // 		t.Fatal()
@@ -41,7 +41,7 @@ package image
 // 		for i := 0; i < 3; i++ {
 // 			mock3.Array = append(mock3.Array, ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
 // 		}
-// 		log.Info(mock3)
+// 		// log.Info(mock3)
 
 // 		err := repo.Create(res2.Room_uid, mock3)
 // 		assert.Nil(t, err)
