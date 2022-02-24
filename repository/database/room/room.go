@@ -3,6 +3,7 @@ package room
 import (
 	"be/entities"
 	"errors"
+	"fmt"
 
 	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
@@ -123,14 +124,15 @@ func (repo *RoomDb) GetAll(s, city, category, name, length, status string) ([]en
 	if category != "" {
 		category += "category =" + category
 	}
-	if limit != "" {
+	if length != "" {
 		limit += " LIMIT " + length
 	}
 	if category != "" && query != "" {
 		middle += "AND"
 	}
 
-	myQueries := query + middle + category + orderBy
+	myQueries := query + middle + category + orderBy + limit
+	fmt.Println(myQueries)
 
 	if res := repo.db.Raw(myQueries).Find(&result); res.Error != nil {
 		return []entities.Room{}, res.Error
