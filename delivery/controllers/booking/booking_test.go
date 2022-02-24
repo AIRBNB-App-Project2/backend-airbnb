@@ -65,9 +65,9 @@ func TestCreate(t *testing.T) {
 
 		reqBody, __ := json.Marshal(map[string]interface{}{
 
-			"user_uid" : "user_uid",
-			"room_uid" : "room_uid",
-			"start_date":""
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
