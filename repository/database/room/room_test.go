@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +35,7 @@ func TestCreate(t *testing.T) {
 		res, err := repo.Create(mock2)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		log.Info(res)
+		// log.Info(res)
 	})
 }
 
@@ -106,7 +105,7 @@ func TestGetByID(t *testing.T) {
 		res, err := repo.GetById(res2.Room_uid)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		log.Info(res)
+		// log.Info(res)
 	})
 }
 
@@ -157,7 +156,7 @@ func TestGetAllRoom(t *testing.T) {
 			t.Fatal()
 		}
 
-		res, err := repo.GetAllRoom(2, "malang", "", "", "")
+		res, err := repo.GetAllRoom(2, "malang", "superior", "mewah", "open")
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
 		// log.Info(res, len(res))

@@ -1,72 +1,95 @@
-// func TestGetAll(t *testing.T) {
+package booking
 
-// config := configs.GetConfig()
-// db := utils.InitDB(config)
-// repo := New(db)
-// db.Migrator().DropTable(&entities.User{})
-// db.Migrator().DropTable(&entities.Room{})
-// db.Migrator().DropTable(&entities.Image{})
-// db.Migrator().DropTable(&entities.Booking{})
-// db.AutoMigrate(&entities.Room{})
+import (
+	"be/configs"
+	"be/entities"
+	"be/repository/database/image"
+	"be/repository/database/room"
+	"be/repository/database/user"
+	"be/utils"
+	"fmt"
+	"testing"
+	"time"
 
-// t.Run("success run get all", func(t *testing.T) {
+	"github.com/labstack/gommon/log"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/datatypes"
+)
 
-//mock User
-// mockUser1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
-// resu1, err1 := user.New(db).Create(mockUser1)
-// if err1 != nil {
-// 	t.Fatal()
-// }
-// mockUser2 := entities.User{Name: "user2 name", Email: "user2 email", Password: "user1 password"}
-// resu2, err2 := user.New(db).Create(mockUser2)
-// if err2 != nil {
-// 	t.Fatal()
-// }
-// mockUser3 := entities.User{Name: "user3 name", Email: "user3 email", Password: "user1 password"}
-// _, err3 := user.New(db).Create(mockUser3)
-// if err3 != nil {
-// 	t.Fatal()
-// }
-//==================
+func TestCreate(t *testing.T) {
 
-// city := "1"
-// var category string = ""
-// var name string = ""
-// var length string = "10"
-// var s string = "xo"
+	config := configs.GetConfig()
+	db := utils.InitDB(config)
+	repo := New(db)
+	db.Migrator().DropTable(&entities.User{})
+	db.Migrator().DropTable(&entities.Room{})
+	db.Migrator().DropTable(&entities.Image{})
+	db.Migrator().DropTable(&entities.Booking{})
+	db.AutoMigrate(&entities.Booking{})
+	db.AutoMigrate(&entities.Image{})
 
-// var status string = ""
-// mockroom1 := entities.Room{User_uid: resu1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Detail: "room1 detail"}
-// _, errroom1 := repo.Create(mockroom1)
-// if errroom1 != nil {
-// 	t.Fatal()
-// }
-// mockroom2 := entities.Room{User_uid: resu2.User_uid, City_id: 1, Name: "roxoom2 name", Price: 100, Detail: "room2 detail"}
-// _, errroom2 := repo.Create(mockroom2)
-// if errroom2 != nil {
-// 	t.Fatal()
-// }
+	t.Run("success run Create", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
 
-// mockroom3 := entities.Room{User_uid: resu2.User_uid, City_id: 2, Name: "roxoxom3 name", Price: 100, Detail: "room1 detail"}
-// _, errroom3 := repo.Create(mockroom3)
-// if errroom3 != nil {
-// 	t.Fatal()
-// }
-// mockroom4 := entities.Room{User_uid: resu2.User_uid, City_id: 2, Name: "room3 name", Price: 100, Detail: "room1 detail"}
-// _, errroom4 := repo.Create(mockroom4)
-// if errroom4 != nil {
-// 	t.Fatal()
-// }
-// mockroom5 := entities.Room{User_uid: resu2.User_uid, City_id: 3, Name: "room3 name", Price: 100, Detail: "room1 detail"}
-// _, errroom5 := repo.Create(mockroom5)
-// if errroom5 != nil {
-// 	t.Fatal()
-// }
+		mock3 := image.ImageReq{}
 
-// res, _ := repo.GetAll(s, city, category, name, length, status)
-// log.Info(res)
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
 
-// // assert.Equal(t, "0", res[0].ID)
-// assert.Equal(t, "roxoom2 name", res[0].Name)
-// assert.Equal(t, res)
-// log.Info(res)
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mock4 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Start_date: datatypes.Date(time.Now()), End_date: datatypes.Date(time.Now().AddDate(0, 0, 1))}
+
+		res, err := repo.Create(res1.User_uid, res2.Room_uid, mock4)
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		log.Info(res)
+	})
+
+	t.Run("success handle overlapping", func(t *testing.T) {
+		mock1 := entities.User{Name: "user2 name", Email: "user2 email", Password: "user2 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 100, Name: "room2 name", Price: 100, Description: "room2 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mock4 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Start_date: datatypes.Date(time.Now().AddDate(0, 0, 2)), End_date: datatypes.Date(time.Now().AddDate(0, 0, 5)), Status: "reservation"}
+		if _, err := repo.Create(res1.User_uid, res2.Room_uid, mock4); err != nil {
+			t.Fatal()
+		}
+		mock5 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Start_date: datatypes.Date(time.Now().AddDate(0, 0, 4)), End_date: datatypes.Date(time.Now().AddDate(0, 0, 6))}
+		res, err := repo.Create(res1.User_uid, res2.Room_uid, mock5)
+		assert.NotNil(t, err)
+		assert.NotNil(t, res)
+		// log.Info(res, err)
+
+	})
+
+}
