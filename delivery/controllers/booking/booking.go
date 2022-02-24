@@ -45,3 +45,30 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
 	}
 }
+func (cont *BookingController) GetAll() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		userUid = middlewares.ExtractTokenId(c)
+
+		res, err := cont.repo.GetAll(userUid)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is empty", nil))
+		}
+
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success get all booking", res))
+	}
+}
+func (cont *BookingController) GetById() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		booking_uid := c.Param("booking_uid")
+
+		res, err := cont.repo.GetById(booking_uid)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
+		}
+
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success get booking", res))
+	}
+}
