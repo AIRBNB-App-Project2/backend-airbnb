@@ -7,6 +7,7 @@ import (
 	"be/utils"
 	"net/http"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/gommon/log"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -55,6 +56,10 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 
 		fileName, _ := utils.UploadFileToS3(s, src, file)
 
+
+		// log.Info(fileName)
+		// user := UserCreateRequest{}
+		// image := entities.Image{}
 		image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName
 
 		res, err := ic.repo.Create(entities.Image{Room_uid: image.Room_uid, Url: image.Url})

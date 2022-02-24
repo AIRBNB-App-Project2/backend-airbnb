@@ -22,6 +22,7 @@ func New(db *gorm.DB) *RoomDb {
 
 func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
 
+
 	var uid string
 
 	for {
@@ -161,3 +162,4 @@ func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 
 	return resp, nil
 }
+
