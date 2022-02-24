@@ -50,7 +50,11 @@ func (repo *BookingDb) Create(user_uid string, room_uid string, newBooking entit
 	if res.Error != nil {
 		return BookingCreateResp{}, res.Error
 	}
+	var bookingres BookingCreateResp
 
-	resp := repo.db.Model(&entities.Booking{}).Where("whe")
-
+	resp := repo.db.Model(&entities.Booking{}).Where("booking_uid =?", newBooking.Booking_uid).Select("bookings.booking_uid as Booking_uid, rooms.name as Name, bookings.description as Description,bookings.start_date as Start_date,bookings.end_date as End_date, sum(rooms.price*bookings.day) as Price_total").Joins("inner join rooms on bookings.room_uid = rooms.room_uid").First(&bookingres)
+	if resp.Error != nil {
+		return BookingCreateResp{}, res.Error
+	}
+	return bookingres, nil
 }
