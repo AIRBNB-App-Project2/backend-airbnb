@@ -24,6 +24,12 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 	e.POST("/login", ac.Login())
 	e.POST("/user", uc.Create())
 
+	//Image
+	e.POST("/image", ic.Create())
+
+	//City
+	e.GET("city", cc.GetAll())
+
 	g := e.Group("", middlewares.JwtMiddleware())
 	g.GET("/user", uc.GetById())
 	g.PUT("/user", uc.Update())
@@ -31,15 +37,10 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 
 	// Room =============================
 
+	g.POST("/room", rc.Create())
 	g.GET("/room", rc.GetAll())
 	g.GET("/room/:room_uid", rc.GetById())
-	g.POST("/room", rc.Create())
 	g.PUT("/room/:room_uid", rc.Update())
-
-	//Image
-	e.POST("/image", ic.Create())
-
-	//City
-	g.GET("city", cc.GetAll())
+	g.DELETE("/room/:room_uid", rc.Delete())
 
 }
