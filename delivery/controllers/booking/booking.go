@@ -2,8 +2,6 @@ package booking
 
 import (
 	"be/delivery/controllers/templates"
-	"be/delivery/middlewares"
-	"be/entities"
 	"be/repository/database/booking"
 	"net/http"
 
@@ -30,19 +28,21 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
 
+		
+
 		if err := v.Struct(book); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
 		}
 
-		book.User_uid = middlewares.ExtractTokenId(c)
+		// book.User_uid = middlewares.ExtractTokenId(c)
 
-		res, err := cont.repo.Create(book.User_uid, book.Room_uid, entities.Booking{Start_date: book.Start_date, End_date: book.End_date, PaymentMethod: book.PaymentMethod})
+		// res, err := cont.repo.Create(book.User_uid, book.Room_uid, entities.Booking{Start_date: book.Start_date, End_date: book.End_date, PaymentMethod: book.PaymentMethod})
 
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
-		}
+		// if err != nil {
+		// 	return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+		// }
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", nil))
 	}
 }
 func (cont *BookingController) GetAll() echo.HandlerFunc {
