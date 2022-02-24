@@ -1,6 +1,6 @@
 package booking
 
-import "gorm.io/datatypes"
+import "be/vendor/gorm.io/datatypes"
 
 type BookingCreateResp struct {
 	Booking_uid string         `json:"booking_uid"`

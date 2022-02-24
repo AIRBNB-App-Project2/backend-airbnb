@@ -18,10 +18,7 @@ require (
 	gorm.io/gorm v1.23.1
 )
 
-require (
-	github.com/go-playground/assert v1.2.1 // indirect
-	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
-)
+require gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

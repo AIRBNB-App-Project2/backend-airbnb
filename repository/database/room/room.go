@@ -111,17 +111,17 @@ func (repo *RoomDb) GetAllRoom(length int, city, category, name, status string) 
 		city = "cities.name LIKE '%" + city + "%'"
 	}
 	if category != "" {
-		category = "AND category = " + category
+		category = "AND category =  '" + category + "'"
 	}
 	if status != "" {
-		status = "AND status = " + status
+		status = "AND status = '" + status + "'"
 	}
 	if name != "" {
 		name = "AND rooms.name LIKE '%" + name + "%'"
 	}
 
 	condition = city + category + status + name
-
+	// log.Info(condition)
 	choose := "rooms.room_uid as Room_uid, rooms.name as Name, price as Price, description as Description, status as Status, (SELECT images.url FROM images where images.room_uid = rooms.room_uid and images.deleted_at is null order by images.id limit 1) as Image"
 
 	res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join cities on rooms.city_id = cities.id").Limit(length).Order("rooms.name ASC").Find(&respRoomAll)
@@ -154,7 +154,6 @@ func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 
 	return resp, nil
 }
-
 
 func (repo *RoomDb) Delete(room_uid string) (entities.Room, error) {
 	roomInit := entities.Room{}
