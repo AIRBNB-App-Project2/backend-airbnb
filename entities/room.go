@@ -13,7 +13,6 @@ type Room struct {
 	Status      string `gorm:"type:enum('open','close');default:'open'"`
 	Price       int
 	Description string
-
 	Images      []Image   `gorm:"foreignKey:Room_uid;references:Room_uid"`
 	Bookings    []Booking `gorm:"foreignKey:Room_uid;references:Room_uid"`
 }

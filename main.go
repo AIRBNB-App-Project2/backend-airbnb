@@ -42,7 +42,6 @@ func main() {
 	roomRepo := RoomRepo.New(db)
 	roomController := room.New(roomRepo)
 	e := echo.New()
-
 	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }

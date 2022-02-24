@@ -8,8 +8,8 @@ import (
 type Booking struct {
 	gorm.Model
 	Booking_uid   string `gorm:"index;type:varchar(22)"`
-	User_uid      string 
-	Room_uid      string 
+	User_uid      string
+	Room_uid      string
 	Start_date    datatypes.Date
 	End_date      datatypes.Date
 	PaymentMethod string `gorm:"type:enum('qris');default:'qris'"`
