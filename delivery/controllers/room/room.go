@@ -45,7 +45,7 @@ func (cont *RoomController) GetAll() echo.HandlerFunc {
 		length, _ := strconv.Atoi(c.QueryParam("length")) 
 		status := c.QueryParam("status")
 
-		res, err := cont.repo.GetAll(s, city, category, name, length, status)
+		res, err := cont.repo.GetAllRoom(length, city, category, name, status)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
