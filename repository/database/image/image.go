@@ -18,9 +18,9 @@ func New(db *gorm.DB) *ImageDb {
 
 func (repo *ImageDb) Create(image entities.Image) (entities.Image, error) {
 
-	// if err := repo.db.Create(&entities.Image{Room_uid: room_uid, Url: image.Array[i].Url}).Error; err != nil {
-	// 	return err
-	// }
+	if err := repo.db.Create(&image).Error; err != nil {
+		return entities.Image{}, err
+	}
 
 	return entities.Image{}, nil
 }
