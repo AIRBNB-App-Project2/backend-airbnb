@@ -81,7 +81,7 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 		return entities.Room{}, res.Error
 	}
 
-	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Detail: upRoom.Detail}); res.Error != nil {
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Description: upRoom.Description}); res.Error != nil {
 		tx.Rollback()
 		return entities.Room{}, res.Error
 	}
