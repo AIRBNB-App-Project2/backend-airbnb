@@ -1,7 +1,5 @@
 package image
 
-import "be/entities"
-
 type Image interface {
-	Create(image entities.Image) (entities.Image, error)
+	Create(room_uid string, image ImageReq) error
 }

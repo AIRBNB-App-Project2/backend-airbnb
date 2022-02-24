@@ -13,8 +13,8 @@
     "url" : "http://{environment}.shop/",
     "variables" : {
       "environment" : {
-        "enum" : [ "dev", "prod" ],
-        "default" : "dev"
+        "default" : "dev",
+        "enum" : [ "dev", "prod" ]
       }
     }
   } ],
@@ -471,29 +471,29 @@
         }
       }
     },
-    "/room/{city_id}" : {
+    "/room/" : {
       "get" : {
         "tags" : [ "room" ],
         "summary" : "get list  rooms",
         "description" : "get list room's with query params /?category=standart/?name=name&?length=10&?status=open",
         "parameters" : [ {
-          "name" : "city_id",
-          "in" : "path",
+          "name" : "city",
+          "in" : "query",
           "description" : "get the room's city by city id",
           "required" : true,
-          "style" : "simple",
-          "explode" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
             "type" : "string"
           },
           "example" : {
-            "city_id" : 1
+            "city_id" : "malang"
           }
         }, {
           "name" : "category",
           "in" : "query",
           "description" : "get the rooms by it category",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -506,7 +506,7 @@
           "name" : "name",
           "in" : "query",
           "description" : "get the list room by name",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -532,7 +532,7 @@
           "name" : "status",
           "in" : "query",
           "description" : "get the list room by name",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
