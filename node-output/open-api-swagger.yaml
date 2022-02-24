@@ -10,13 +10,7 @@
     "version" : "1.0.0"
   },
   "servers" : [ {
-    "url" : "http://{environment}.shop/",
-    "variables" : {
-      "environment" : {
-        "default" : "dev",
-        "enum" : [ "dev", "prod" ]
-      }
-    }
+    "url" : "http://18.140.1.124:8081"
   } ],
   "tags" : [ {
     "name" : "login",
@@ -407,7 +401,7 @@
                 "name" : "anonim",
                 "category" : "standart",
                 "address" : "address",
-                "city" : "city",
+                "city_id" : 1,
                 "price" : 20000,
                 "description" : "room description"
               }
