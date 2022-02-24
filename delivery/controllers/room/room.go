@@ -6,6 +6,7 @@ import (
 	"be/entities"
 	"be/repository/database/room"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator"
 
@@ -38,12 +39,11 @@ func (cont *RoomController) GetById() echo.HandlerFunc {
 func (cont *RoomController) GetAll() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		s := c.QueryParam("s")
-		city := c.QueryParam("s")
-		category := c.QueryParam("s")
-		name := c.QueryParam("s")
-		length := c.QueryParam("s")
-		status := c.QueryParam("s")
+		city := c.QueryParam("city")
+		category := c.QueryParam("category")
+		name := c.QueryParam("name")
+		length, _ := strconv.Atoi(c.QueryParam("length")) 
+		status := c.QueryParam("status")
 
 		res, err := cont.repo.GetAll(s, city, category, name, length, status)
 

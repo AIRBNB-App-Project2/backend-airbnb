@@ -37,7 +37,7 @@ func initConfig() *AppConfig {
 	defaultConfig.Address = getEnv("ADDRESS", "localhost")
 	defaultConfig.DB_Port = 3306
 	defaultConfig.Username = getEnv("USERNAME", "root")
-	defaultConfig.Password = getEnv("PASSWORD", "adol1122")
+	defaultConfig.Password = getEnv("PASSWORD", "root")
 
 	fmt.Println(defaultConfig)
 
@@ -45,7 +45,7 @@ func initConfig() *AppConfig {
 }
 
 func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok && value != "Thinkpad X250" {
+	if value, ok := os.LookupEnv(key); ok && value != "faliq" {
 		fmt.Println(value)
 		return value
 	}

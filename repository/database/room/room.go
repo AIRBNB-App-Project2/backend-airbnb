@@ -22,7 +22,6 @@ func New(db *gorm.DB) *RoomDb {
 
 func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
 
-
 	var uid string
 
 	for {
@@ -41,6 +40,11 @@ func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
 
 	if err := repo.db.Create(&room).Error; err != nil {
 		return RoomCreateResp{}, err
+	}
+
+	resImg := repo.db.Model(&entities.Image{}).Create(&entities.Image{Room_uid: room.Room_uid})
+	if resImg.Error != nil {
+		return RoomCreateResp{}, resImg.Error
 	}
 
 	resp := RoomCreateResp{}
@@ -141,6 +145,51 @@ func (repo *RoomDb) GetAll(s, city, category, name, length, status string) ([]en
 
 	return result, nil
 }
+
+func (repo *RoomDb) GetAllRoom(length int, city, category, name, status string) ([]RoomGetAllResp, error) {
+
+	respRoomAll := []RoomGetAllResp{}
+
+	var condition string
+
+	if city != "" {
+		city = "cities.name LIKE '%" + city + "%'"
+	}
+	if category != "" {
+		category = "AND category = " + category
+	}
+	if status != "" {
+		status = "AND status = " + status
+	}
+	if name != "" {
+		name = "AND rooms.name LIKE '%" + name + "%'"
+	}
+
+	condition = city + category + status + name
+
+	choose := "rooms.room_uid as Room_uid, rooms.name as Name, price as Price, description as Description, status as Status, ()"
+	if length == 0 {
+		res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join images on rooms.room_uid = images.room_uid").Joins("inner join cities on rooms.city_id = cities.id").Find(&respRoomAll)
+		if res.Error != nil {
+			return []RoomGetAllResp{}, res.Error
+		}
+	}
+	res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join cities on rooms.city_id = cities.id").Limit(length).Find(&respRoomAll)
+
+	if res.Error != nil {
+		return []RoomGetAllResp{}, res.Error
+	}
+
+	// image := Images{}
+
+	// resImg := repo.db.Model(&entities.Image{}).Where("room_uid", room_uid).First(&image)
+	// if resImg.Error != nil {
+
+	// }
+
+	return respRoomAll, nil
+}
+
 func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 	resp := RoomGetByIdResp{}
 
@@ -162,4 +211,3 @@ func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 
 	return resp, nil
 }
-
