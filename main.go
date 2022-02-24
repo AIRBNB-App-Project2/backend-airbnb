@@ -11,11 +11,13 @@ import (
 	"fmt"
 
 	authLib "be/repository/database/auth"
+	"be/repository/database/booking"
 	cityRep "be/repository/database/city"
 
 	imageLib "be/repository/database/image"
 	RoomRepo "be/repository/database/room"
 
+	bookingLib "be/repository/database/booking"
 	userLib "be/repository/database/user"
 	"be/utils"
 
@@ -41,7 +43,11 @@ func main() {
 
 	roomRepo := RoomRepo.New(db)
 	roomController := room.New(roomRepo)
+
+	bookingRepo := bookingLib.New(db)
+	bookingController := booking.New(bookingRepo)
+
 	e := echo.New()
-	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController)
+	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController, bookingController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
