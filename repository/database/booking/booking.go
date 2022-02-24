@@ -3,6 +3,7 @@ package booking
 import (
 	"be/entities"
 	"errors"
+	"time"
 
 	"github.com/lithammer/shortuuid"
 	"gorm.io/gorm"
@@ -58,5 +59,20 @@ func (repo *BookingDb) Create(user_uid string, room_uid string, newBooking entit
 		return BookingCreateResp{}, res.Error
 	}
 
+	layoutIso := "2006-01-02T00:00:00+07:00"
+	start_date, err := time.Parse(layoutIso, bookingres.Start_date)
+	if err != nil {
+		return BookingCreateResp{}, err
+	}
+	bookingres.Start_date = start_date.Format(time.RFC822)
+
+	end_date, err := time.Parse(layoutIso, bookingres.End_date)
+	if err != nil {
+		return BookingCreateResp{}, err
+	}
+	bookingres.End_date = end_date.Format(time.RFC822)
+
 	return bookingres, nil
 }
+
+// func (repo *BookingDb) Update
