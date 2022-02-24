@@ -3,7 +3,6 @@ package room
 import (
 	"be/entities"
 	"errors"
-	"fmt"
 
 	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
@@ -21,7 +20,6 @@ func New(db *gorm.DB) *RoomDb {
 }
 
 func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
-
 
 	var uid string
 
@@ -41,6 +39,11 @@ func (repo *RoomDb) Create(room entities.Room) (RoomCreateResp, error) {
 
 	if err := repo.db.Create(&room).Error; err != nil {
 		return RoomCreateResp{}, err
+	}
+
+	resImg := repo.db.Model(&entities.Image{}).Create(&entities.Image{Room_uid: room.Room_uid})
+	if resImg.Error != nil {
+		return RoomCreateResp{}, resImg.Error
 	}
 
 	resp := RoomCreateResp{}
@@ -98,49 +101,38 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 	return resRoom1, tx.Commit().Error
 }
 
-func (repo *RoomDb) GetAll(s, city, category, name, length, status string) ([]entities.Room, error) {
-	var result []entities.Room
-	var query string = "SELECT * FROM rooms "
-	var orderBy string = ""
-	var limit string = ""
+func (repo *RoomDb) GetAllRoom(length int, city, category, name, status string) ([]RoomGetAllResp, error) {
 
-	if s != "" {
-		if city != "" {
-			city = "city_id = '" + city + "' AND "
-		}
-		myQueries := city + " name LIKE ?"
-		s = "%" + s + "%"
-		if res := repo.db.Preload("Images").Preload("Bookings").Where(myQueries, s).Find(&result); res.Error != nil {
-			return []entities.Room{}, res.Error
-		}
+	respRoomAll := []RoomGetAllResp{}
 
-		return result, nil
+	var condition string
 
-	}
-
-	middle := ""
 	if city != "" {
-		query = "SELECT * FROM rooms WHERE city_id=" + city
+		city = "cities.name LIKE '%" + city + "%'"
 	}
 	if category != "" {
-		category += "category =" + category
+		category = "AND category = " + category
 	}
-	if length != "" {
-		limit += " LIMIT " + length
+	if status != "" {
+		status = "AND status = " + status
 	}
-	if category != "" && query != "" {
-		middle += "AND"
-	}
-
-	myQueries := query + middle + category + orderBy + limit
-	fmt.Println(myQueries)
-
-	if res := repo.db.Raw(myQueries).Find(&result); res.Error != nil {
-		return []entities.Room{}, res.Error
+	if name != "" {
+		name = "AND rooms.name LIKE '%" + name + "%'"
 	}
 
-	return result, nil
+	condition = city + category + status + name
+
+	choose := "rooms.room_uid as Room_uid, rooms.name as Name, price as Price, description as Description, status as Status, (SELECT images.url FROM images where images.room_uid = rooms.room_uid and images.deleted_at is null order by images.id limit 1) as Image"
+
+	res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join cities on rooms.city_id = cities.id").Limit(length).Order("rooms.name ASC").Find(&respRoomAll)
+
+	if res.Error != nil {
+		return []RoomGetAllResp{}, res.Error
+	}
+
+	return respRoomAll, nil
 }
+
 func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 	resp := RoomGetByIdResp{}
 
@@ -163,3 +155,15 @@ func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 	return resp, nil
 }
 
+
+func (repo *RoomDb) Delete(room_uid string) (entities.Room, error) {
+	roomInit := entities.Room{}
+
+	resp := repo.db.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Delete(&roomInit)
+
+	if resp.RowsAffected == 0 {
+		return entities.Room{}, errors.New(gorm.ErrRecordNotFound.Error())
+	}
+
+	return roomInit, nil
+}

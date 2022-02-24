@@ -27,3 +27,12 @@ type RoomCreateResp struct {
 	Description string `json:"description"`
 	Price       string `json:"price"`
 }
+
+type RoomGetAllResp struct {
+	Room_uid    string `json:"room_uid"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	Price       string `json:"price"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+}

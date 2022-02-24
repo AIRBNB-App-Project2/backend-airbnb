@@ -26,8 +26,8 @@ func (repo *MockRoomRepo) Update(user_uid string, room_uid string, upRoom entiti
 func (repo *MockRoomRepo) GetById(room_uid string) (room.RoomGetByIdResp, error) {
 	return room.RoomGetByIdResp{}, nil
 }
-func (repo *MockRoomRepo) GetAll(s, city, category, name, length, status string) ([]entities.Room, error) {
-	return []entities.Room{}, nil
+func (repo *MockRoomRepo) GetAllRoom(length int, city, category, name, status string) ([]room.RoomGetAllResp, error) {
+	return []room.RoomGetAllResp{}, nil
 }
 
 func TestGetById(t *testing.T) {
