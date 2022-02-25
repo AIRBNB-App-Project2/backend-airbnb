@@ -4,22 +4,30 @@ import (
 	"be/delivery/controllers/templates"
 	"be/delivery/middlewares"
 	"be/entities"
+	imagerepo "be/repository/database/image"
 	"be/repository/database/room"
+	"be/utils"
 	"net/http"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/go-playground/validator"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 type RoomController struct {
 	repo room.Room
+	repImg imagerepo.Image
 }
 
-func New(repo room.Room) *RoomController {
+func New(repo room.Room, repoImg imagerepo.Image) *RoomController {
 	return &RoomController{
 		repo: repo,
+		repImg: repoImg,
 	}
 }
 
@@ -43,7 +51,7 @@ func (cont *RoomController) GetAll() echo.HandlerFunc {
 		city := c.QueryParam("city")
 		category := c.QueryParam("category")
 		name := c.QueryParam("name")
-		length, _ := strconv.Atoi(c.QueryParam("length")) 
+		length, _ := strconv.Atoi(c.QueryParam("length"))
 		status := c.QueryParam("status")
 
 		res, err := cont.repo.GetAllRoom(length, city, category, name, status)
@@ -73,7 +81,57 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 		res, err := cont.repo.Create(entities.Room{User_uid: room.User_uid, City_id: room.City_id, Address: room.Address, Name: room.Name, Category: room.Category, Status: room.Status, Price: room.Price, Description: room.Description})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for upload room form", nil))
+		}
+
+		form, err1 := c.MultipartForm()
+		if err1 != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in multipart form", nil))
+		}
+		files := form.File["files"]
+
+		for _, file := range files {
+			image := entities.Image{}
+			src, err1 := file.Open()
+			if err1 != nil {
+				return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "error in open file image", nil))
+			}
+			// log.Info(src)
+
+			s, err2 := session.NewSession(&aws.Config{
+				Region: aws.String("ap-southeast-1"),
+				Credentials: credentials.NewStaticCredentials(
+					"AKIAS4KA3W5H4Z73S3NR",                     // id
+					"XVGjvN4ApOPqNFH95wfmpM06PpQfqiXdDhGuBcFp", // secret
+					""),
+			})
+
+			if err2 != nil {
+				return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in configuration with s3 aws", nil))
+			}
+
+			fileName, err3 := utils.UploadFileToS3(s, src, file)
+
+			if err3 != nil {
+				return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image to s3 aes", nil))
+			}
+
+			image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName
+
+			log.Info(image.Url)
+
+			imageArrInput := []imagerepo.ImageInput{}
+
+			imageArrInput = append(imageArrInput, imagerepo.ImageInput{Url: image.Url})
+
+			imageReq := imagerepo.ImageReq{Array: imageArrInput}
+
+			err4 := cont.repImg.Create(res.Room_uid, imageReq)
+
+			if err4 != nil {
+				return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image", nil))
+			}
+
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))

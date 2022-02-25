@@ -42,7 +42,7 @@ func main() {
 	cityController := city.New(cityRepo)
 
 	roomRepo := RoomRepo.New(db)
-	roomController := room.New(roomRepo)
+	roomController := room.New(roomRepo, imageRepo)
 
 	bookingRepo := bookingLib.New(db)
 	bookingController := booking.New(bookingRepo)
