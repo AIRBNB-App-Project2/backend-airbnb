@@ -100,9 +100,9 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 func (cont *BookingController) Delete() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		booking_uid := c.Param("booking_uid")
-		user_uid := middlewares.ExtractTokenId(c)
+		// user_uid := middlewares.ExtractTokenId(c)
 
-		res, err := cont.repo.Delete(user_uid, booking_uid)
+		res, err := cont.repo.Delete(booking_uid)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
