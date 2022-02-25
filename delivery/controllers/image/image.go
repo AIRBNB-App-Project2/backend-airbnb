@@ -29,7 +29,6 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		//default image
 
-		image := CreateImageRequesFormat{}
 		// image.Room_uid = c.FormValue("room_uid")
 
 		form, err1 := c.MultipartForm()
@@ -39,6 +38,7 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 		files := form.File["files"]
 
 		for _, file := range files {
+			image := CreateImageRequesFormat{}
 			src, err := file.Open()
 			if err != nil {
 				return err
