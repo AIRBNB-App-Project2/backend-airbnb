@@ -60,7 +60,7 @@ func (cont *RoomController) GetAll() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get all Room", res))
 	}
 }
 func (cont *RoomController) Create() echo.HandlerFunc {
@@ -134,7 +134,7 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success add Room", res))
 	}
 }
 func (cont *RoomController) Update() echo.HandlerFunc {
@@ -153,7 +153,7 @@ func (cont *RoomController) Update() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success update Room", res))
 	}
 }
 
@@ -167,6 +167,6 @@ func (cont *RoomController) Delete() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success delete Room", res))
 	}
 }
