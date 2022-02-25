@@ -2,6 +2,7 @@ package routes
 
 import (
 	"be/delivery/controllers/auth"
+	"be/delivery/controllers/booking"
 	"be/delivery/controllers/city"
 	"be/delivery/controllers/image"
 	"be/delivery/controllers/room"
@@ -12,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, ic *image.ImageController, cc *city.CityController, rc *room.RoomController /* , bc *booking.BookingController */) {
+func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, ic *image.ImageController, cc *city.CityController, rc *room.RoomController, bc *booking.BookingController) {
 	e.Use(middleware.CORS())
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -49,6 +50,9 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 	g.DELETE("/room/:room_uid", rc.Delete())
 
 	//Booking ============================
-	// g.POST("/booking", bc.Create())
+	g.POST("/booking", bc.Create())
+	g.GET("/booking/:booking_uid", bc.GetById())
+	g.PUT("/booking/booking_uid", bc.Update())
+	g.DELETE("/booking/booking_uid", bc.Delete())
 
 }
