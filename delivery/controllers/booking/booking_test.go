@@ -65,17 +65,10 @@ func TestCreate(t *testing.T) {
 
 		// reqBody, __ := json.Marshal(map[string]interface{}{
 
-<<<<<<< HEAD
-			"user_uid":   "user_uid",
-			"room_uid":   "room_uid",
-			"start_date": "",
-		})
-=======
 		// 	"user_uid" : "user_uid",
 		// 	"room_uid" : "room_uid",
 		// 	// "start_date":""
 		// })
->>>>>>> b208bdbd164f6d9f81b960e572173ba82da28fd3
 
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
 		res := httptest.NewRecorder()
