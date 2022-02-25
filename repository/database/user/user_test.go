@@ -37,6 +37,7 @@ func TestCreate(t *testing.T) {
 		res, err := repo.Create(mockUser)
 		assert.NotNil(t, err)
 		assert.Equal(t, entities.User{}, res)
+		// log.Info(err)
 	})
 }
 

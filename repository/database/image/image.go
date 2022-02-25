@@ -16,11 +16,23 @@ func New(db *gorm.DB) *ImageDb {
 	}
 }
 
-func (repo *ImageDb) Create(image entities.Image) (entities.Image, error) {
+func (repo *ImageDb) Create(room_uid string, image ImageReq) error {
 
-	// if err := repo.db.Create(&entities.Image{Room_uid: room_uid, Url: image.Array[i].Url}).Error; err != nil {
-	// 	return err
-	// }
+	imgInit := entities.Image{}
 
-	return entities.Image{}, nil
+	delImg := repo.db.Model(&entities.Image{}).Where("room_uid = ?", room_uid).Delete(&imgInit)
+
+	if delImg.Error != nil {
+		return delImg.Error
+	}
+
+	for i := 0; i < len(image.Array); i++ {
+
+		if err := repo.db.Create(&entities.Image{Room_uid: room_uid, Url: image.Array[i].Url}).Error; err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }

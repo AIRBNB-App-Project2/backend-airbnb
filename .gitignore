@@ -1,2 +1,4 @@
 configs/config.go
 vendor/
+config.go
+./configs/config.go

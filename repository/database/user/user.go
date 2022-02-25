@@ -22,6 +22,14 @@ func New(db *gorm.DB) *UserDb {
 
 func (repo *UserDb) Create(user entities.User) (entities.User, error) {
 
+	userInit := entities.User{}
+
+	checkEmail := repo.db.Where("email = ?", user.Email).Find(&userInit)
+
+	if checkEmail.RowsAffected != 0 {
+		return entities.User{}, errors.New("email already exist")
+	}
+
 	var uid string
 
 	for {

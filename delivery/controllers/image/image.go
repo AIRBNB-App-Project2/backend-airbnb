@@ -2,12 +2,10 @@ package image
 
 import (
 	"be/delivery/controllers/templates"
-	"be/entities"
-	"be/repository/database/image"
+	imageRepo "be/repository/database/image"
 	"be/utils"
 	"net/http"
 
-	"github.com/go-playground/validator"
 	"github.com/labstack/gommon/log"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -18,10 +16,10 @@ import (
 )
 
 type ImageController struct {
-	repo image.Image
+	repo imageRepo.Image
 }
 
-func New(repo image.Image) *ImageController {
+func New(repo imageRepo.Image) *ImageController {
 	return &ImageController{
 		repo: repo,
 	}
@@ -29,6 +27,10 @@ func New(repo image.Image) *ImageController {
 
 func (ic *ImageController) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		//default image
+
+		image := CreateImageRequesFormat{}
+		image.Room_uid = c.FormValue("room_uid")
 
 		file, err := c.FormFile("file")
 		if err != nil {
@@ -42,7 +44,7 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 
 		defer src.Close()
 
-		s, err := session.NewSession(&aws.Config{
+		s, _ := session.NewSession(&aws.Config{
 			Region: aws.String("ap-southeast-1"),
 			Credentials: credentials.NewStaticCredentials(
 				"AKIAS4KA3W5H4Z73S3NR",                     // id
@@ -54,23 +56,21 @@ func (ic *ImageController) Create() echo.HandlerFunc {
 
 		// log.Info(fileName)
 		// user := UserCreateRequest{}
-		image := entities.Image{}
+		// image := entities.Image{}
 		image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName
-		log.Info(image.Url)
 
-		if err := c.Bind(&image); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
-		}
-		v := validator.New()
-		if err := v.Struct(image); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
-		}
+		imageArrInput := []imageRepo.ImageInput{}
 
-		res, err := ic.repo.Create(entities.Image{})
+		imageArrInput = append(imageArrInput, imageRepo.ImageInput{Url: image.Url})
+
+		imageReq := imageRepo.ImageReq{Array: imageArrInput}
+
+		err1 := ic.repo.Create(image.Room_uid, imageReq)
+
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error fo create new image", err))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error fo create new image", err1))
 		}
 
-		return c.JSON(http.StatusCreated, templates.Success(http.StatusCreated, "Success create new image", res))
+		return c.JSON(http.StatusCreated, templates.Success(http.StatusCreated, "Success create new image", nil))
 	}
 }

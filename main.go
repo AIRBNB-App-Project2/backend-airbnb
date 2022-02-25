@@ -3,16 +3,21 @@ package main
 import (
 	"be/configs"
 	"be/delivery/controllers/auth"
+	"be/delivery/controllers/booking"
 	"be/delivery/controllers/city"
 	"be/delivery/controllers/image"
+	"be/delivery/controllers/room"
 	"be/delivery/controllers/user"
 	"be/delivery/routes"
 	"fmt"
 
 	authLib "be/repository/database/auth"
+	bookingLib "be/repository/database/booking"
 	cityRep "be/repository/database/city"
 
 	imageLib "be/repository/database/image"
+	RoomRepo "be/repository/database/room"
+
 	userLib "be/repository/database/user"
 	"be/utils"
 
@@ -36,8 +41,13 @@ func main() {
 	cityRepo := cityRep.New(db)
 	cityController := city.New(cityRepo)
 
-	e := echo.New()
+	roomRepo := RoomRepo.New(db)
+	roomController := room.New(roomRepo)
 
-	routes.RoutesPath(e, userController, authController, imageController, cityController)
+	bookingRepo := bookingLib.New(db)
+	bookingController := booking.New(bookingRepo)
+
+	e := echo.New()
+	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController, bookingController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
 }
