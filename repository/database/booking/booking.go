@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -34,6 +33,11 @@ func (repo *BookingDb) Create(user_uid string, room_uid string, newBooking Booki
 	if errE != nil {
 		return BookingCreateResp{}, errors.New("error in time parse end date")
 	}
+
+	if time.Since(s_date) > 0 || time.Since(e_date) > 0 {
+		return BookingCreateResp{}, errors.New("error in time is in the past")
+	}
+
 	days := e_date.Sub(s_date).Hours() / 24
 	// log.Info(days)
 	if days < 0 {
@@ -95,8 +99,14 @@ func (repo *BookingDb) Create(user_uid string, room_uid string, newBooking Booki
 	if resp.Error != nil {
 		return BookingCreateResp{}, resp.Error
 	}
-	log.Info(bookingres.Start_date, bookingres.End_date)
-	layoutOutput := "2006-01-02T00:00:00Z"
+	// log.Info(bookingres.Start_date, bookingres.End_date)
+	var layoutOutput string
+	if string(bookingres.Start_date[len(bookingres.Start_date)-1]) == "Z" {
+		layoutOutput = "2006-01-02T00:00:00Z"
+	} else {
+		layoutOutput = "2006-01-02T00:00:00+07:00"
+	}
+
 	start_date, err := time.Parse(layoutOutput, bookingres.Start_date)
 	if err != nil {
 		return BookingCreateResp{}, err
@@ -127,11 +137,15 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 		if errE != nil {
 			return BookingCreateResp{}, errors.New("error in time parse end date")
 		}
+		if time.Since(s_date) > 0 || time.Since(e_date) > 0 {
+			return BookingCreateResp{}, errors.New("error in time is in the past")
+		}
 		days := e_date.Sub(s_date).Hours() / 24
 		// log.Info(days)
 		if days < 0 {
 			return BookingCreateResp{}, errors.New("error the end date must larger than start date")
 		}
+
 		bookingUpdate.Start_date = datatypes.Date(s_date)
 		bookingUpdate.End_date = datatypes.Date(e_date)
 	}
@@ -159,7 +173,10 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 		return BookingCreateResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 
+	bookingInit.ID = 0
+
 	if upBooking.Status == "" {
+		// log.Info("come here")
 		resRev := tx.Model(entities.Booking{}).Where("status = 'paid' AND start_date <= ? AND end_date >= ? AND booking_uid != ?", bookingUpdate.End_date, bookingUpdate.Start_date, booking_uid).Find(&bookingInit)
 		// log.Info(resRev.RowsAffected)
 		if resRev.RowsAffected != 0 {
@@ -193,7 +210,7 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 		return BookingCreateResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 	bookingInit.DeletedAt = gorm.DeletedAt{}
-	bookingInit.ID = 0
+	// log.Info(bookingInit)
 	if res := tx.Create(&bookingInit); res.Error != nil {
 		// log.Info("test")
 		return BookingCreateResp{}, res.Error
@@ -215,6 +232,26 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 		return BookingCreateResp{}, resp.Error
 	}
 
+	var layoutOutput string
+	if string(bookingres.Start_date[len(bookingres.Start_date)-1]) == "Z" {
+		layoutOutput = "2006-01-02T00:00:00Z"
+	} else {
+		layoutOutput = "2006-01-02T00:00:00+07:00"
+	}
+
+	start_date, err := time.Parse(layoutOutput, bookingres.Start_date)
+	if err != nil {
+		return BookingCreateResp{}, err
+	}
+	outputDateFormat := "02 Jan 2006"
+	bookingres.Start_date = start_date.Format(outputDateFormat)
+
+	end_date, err := time.Parse(layoutOutput, bookingres.End_date)
+	if err != nil {
+		return BookingCreateResp{}, err
+	}
+	bookingres.End_date = end_date.Format(outputDateFormat)
+
 	return bookingres, nil
 
 }
@@ -228,6 +265,26 @@ func (repo *BookingDb) GetById(booking_uid string) (BookingGetByIdResp, error) {
 		// log.Info(resp.Error)
 		return BookingGetByIdResp{}, resp.Error
 	}
+
+	var layoutOutput string
+	if string(bookingResp.Start_date[len(bookingResp.Start_date)-1]) == "Z" {
+		layoutOutput = "2006-01-02T00:00:00Z"
+	} else {
+		layoutOutput = "2006-01-02T00:00:00+07:00"
+	}
+
+	start_date, err := time.Parse(layoutOutput, bookingResp.Start_date)
+	if err != nil {
+		return BookingGetByIdResp{}, err
+	}
+	outputDateFormat := "02 Jan 2006"
+	bookingResp.Start_date = start_date.Format(outputDateFormat)
+
+	end_date, err := time.Parse(layoutOutput, bookingResp.End_date)
+	if err != nil {
+		return BookingGetByIdResp{}, err
+	}
+	bookingResp.End_date = end_date.Format(outputDateFormat)
 
 	return bookingResp, nil
 }
