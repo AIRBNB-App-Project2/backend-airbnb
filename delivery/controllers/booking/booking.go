@@ -3,14 +3,13 @@ package booking
 import (
 	"be/delivery/controllers/templates"
 	"be/delivery/middlewares"
-	"be/entities"
 	"be/repository/database/booking"
 	"net/http"
 	"time"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"gorm.io/datatypes"
+	"github.com/labstack/gommon/log"
 )
 
 type BookingController struct {
@@ -37,19 +36,20 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		}
 
 		book.User_uid = middlewares.ExtractTokenId(c)
-
+		log.Info(book)
 		//parse string tu date time.Time
-		layoutFormat := "2006-01-02 15:04:05"
+		layoutFormat := "02 Jan 2006"
 		start_date, _ := time.Parse(layoutFormat, book.Start_date)
 		end_date, _ := time.Parse(layoutFormat, book.End_date)
+		// log.Info(start_date, end_date)
 
-		res, err := cont.repo.Create(book.User_uid, book.Room_uid, entities.Booking{Start_date: datatypes.Date(start_date), End_date: datatypes.Date(end_date)})
+		res, err := cont.repo.Create(book.User_uid, book.Room_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String()})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to create booking", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to add booking" + err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success create booking", res))
+		return c.JSON(http.StatusCreated, templates.Success(http.StatusCreated, "Success add booking", res))
 	}
 }
 
@@ -60,7 +60,7 @@ func (cont *BookingController) GetById() echo.HandlerFunc {
 		res, err := cont.repo.GetById(booking_uid)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found" + err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success get booking", res))
@@ -83,14 +83,14 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 		book.User_uid = middlewares.ExtractTokenId(c)
 
 		//parse string tu date time.Time
-		layoutFormat := "2006-01-02 15:04:05"
+		layoutFormat := "02 Jan 2006"
 		start_date, _ := time.Parse(layoutFormat, book.Start_date)
 		end_date, _ := time.Parse(layoutFormat, book.End_date)
 
-		res, err := cont.repo.Update(book.User_uid, book.Room_uid, entities.Booking{Start_date: datatypes.Date(start_date), End_date: datatypes.Date(end_date)})
+		res, err := cont.repo.Update(book.User_uid, book.Room_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String(), Status: book.Status, PaymentMethod: book.PaymentMethod})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for update booking" + err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success update booking", res))
@@ -105,7 +105,7 @@ func (cont *BookingController) Delete() echo.HandlerFunc {
 		res, err := cont.repo.Delete(booking_uid)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for delete boooking" + err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success delete booking", res))

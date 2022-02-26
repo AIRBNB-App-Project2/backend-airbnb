@@ -27,8 +27,20 @@ func (m *MockAuthLib) Login(UserLogin entities.User) (entities.User, error) {
 
 type MockBookingRepo struct{}
 
-func (m *MockBookingRepo) Create(user_uid string, room_uid string, newBooking entities.Booking) (booking.BookingCreateResp, error) {
+func (m *MockBookingRepo) Create(user_uid string, room_uid string, newBooking booking.BookingReq) (booking.BookingCreateResp, error) {
 	return booking.BookingCreateResp{}, nil
+}
+
+func (m *MockBookingRepo) Update(user_uid string, booking_uid string, upBooking booking.BookingReq) (booking.BookingCreateResp, error) {
+	return booking.BookingCreateResp{}, nil
+}
+
+func (m *MockBookingRepo) GetById(booking_uid string) (booking.BookingGetByIdResp, error) {
+	return booking.BookingGetByIdResp{}, nil
+}
+
+func (m *MockBookingRepo) Delete(booking_uid string) (entities.Booking, error) {
+	return entities.Booking{}, nil
 }
 
 func TestCreate(t *testing.T) {
@@ -63,19 +75,20 @@ func TestCreate(t *testing.T) {
 	t.Run("success Create", func(t *testing.T) {
 		e := echo.New()
 
-		// reqBody, __ := json.Marshal(map[string]interface{}{
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-		// 	"user_uid" : "user_uid",
-		// 	"room_uid" : "room_uid",
-		// 	// "start_date":""
-		// })
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "25 Feb 2022",
+			"end_date":   "28 Feb 2022",
+		})
 
-		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
 		res := httptest.NewRecorder()
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
 		context := e.NewContext(req, res)
-		context.SetPath("/tasks/:uid")
+		context.SetPath("/booking")
 
 		taskController := New(&MockBookingRepo{})
 		// taskController.GetById()(context)
@@ -88,7 +101,7 @@ func TestCreate(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-		assert.Equal(t, 202, response.Code)
+		assert.Equal(t, 201, response.Code)
 
 	})
 
