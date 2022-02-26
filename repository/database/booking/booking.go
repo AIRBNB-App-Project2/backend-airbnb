@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/labstack/gommon/log"
 	"github.com/lithammer/shortuuid"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -94,7 +95,8 @@ func (repo *BookingDb) Create(user_uid string, room_uid string, newBooking Booki
 	if resp.Error != nil {
 		return BookingCreateResp{}, resp.Error
 	}
-	layoutOutput := "2006-01-02T00:00:00+07:00"
+	log.Info(bookingres.Start_date, bookingres.End_date)
+	layoutOutput := "2006-01-02T00:00:00Z"
 	start_date, err := time.Parse(layoutOutput, bookingres.Start_date)
 	if err != nil {
 		return BookingCreateResp{}, err
