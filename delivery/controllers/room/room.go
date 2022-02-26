@@ -20,13 +20,13 @@ import (
 )
 
 type RoomController struct {
-	repo room.Room
+	repo   room.Room
 	repImg imagerepo.Image
 }
 
 func New(repo room.Room, repoImg imagerepo.Image) *RoomController {
 	return &RoomController{
-		repo: repo,
+		repo:   repo,
 		repImg: repoImg,
 	}
 }
@@ -90,6 +90,7 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 		}
 		files := form.File["files"]
 
+		imageArrInput := []imagerepo.ImageInput{}
 		for _, file := range files {
 			image := entities.Image{}
 			src, err1 := file.Open()
@@ -120,18 +121,16 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 
 			log.Info(image.Url)
 
-			imageArrInput := []imagerepo.ImageInput{}
-
 			imageArrInput = append(imageArrInput, imagerepo.ImageInput{Url: image.Url})
 
-			imageReq := imagerepo.ImageReq{Array: imageArrInput}
+		}
 
-			err4 := cont.repImg.Create(res.Room_uid, imageReq)
+		imageReq := imagerepo.ImageReq{Array: imageArrInput}
 
-			if err4 != nil {
-				return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image", nil))
-			}
+		err4 := cont.repImg.Create(res.Room_uid, imageReq)
 
+		if err4 != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image", nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success add Room", res))

@@ -3,14 +3,6 @@ package room
 import (
 	"be/entities"
 	"be/repository/database/room"
-	"bytes"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
-	"github.com/go-playground/assert/v2"
-	"github.com/labstack/echo/v4"
 )
 
 type MockRoomRepo struct{}
@@ -33,24 +25,24 @@ func (repo *MockRoomRepo) GetAllRoom(length int, city, category, name, status st
 	return []room.RoomGetAllResp{}, nil
 }
 
-func TestGetById(t *testing.T) {
-	t.Run("success get by id", func(t *testing.T) {
-		e := echo.New()
+// func TestGetById(t *testing.T) {
+// 	t.Run("success get by id", func(t *testing.T) {
+// 		e := echo.New()
 
-		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
-		res := httptest.NewRecorder()
-		req.Header.Set("Content-Type", "application/json")
+// 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
+// 		res := httptest.NewRecorder()
+// 		req.Header.Set("Content-Type", "application/json")
 
-		context := e.NewContext(req, res)
-		context.SetPath("/room")
+// 		context := e.NewContext(req, res)
+// 		context.SetPath("/room")
 
-		userController := New(&MockRoomRepo{})
-		userController.GetById()(context)
+// 		userController := New(&MockRoomRepo{})
+// 		userController.GetById()(context)
 
-		response := GetURoomByIdResponseFormat{}
+// 		response := GetURoomByIdResponseFormat{}
 
-		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-		assert.Equal(t, 200, response.Code)
-	})
-}
+// 		assert.Equal(t, 200, response.Code)
+// 	})
+// }

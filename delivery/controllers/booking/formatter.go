@@ -1,6 +1,8 @@
 package booking
 
-import "be/entities"
+import (
+	"be/entities"
+)
 
 type CreateBookingRequesFormat struct {
 	User_uid   string

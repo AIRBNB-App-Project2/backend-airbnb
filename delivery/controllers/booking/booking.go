@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"gorm.io/datatypes"
 )
 
@@ -37,11 +38,12 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		}
 
 		book.User_uid = middlewares.ExtractTokenId(c)
-
+		log.Info(book)
 		//parse string tu date time.Time
-		layoutFormat := "2006-01-02 15:04:05"
+		layoutFormat := "02 Jan 2006"
 		start_date, _ := time.Parse(layoutFormat, book.Start_date)
 		end_date, _ := time.Parse(layoutFormat, book.End_date)
+		log.Info(start_date, end_date)
 
 		res, err := cont.repo.Create(book.User_uid, book.Room_uid, entities.Booking{Start_date: datatypes.Date(start_date), End_date: datatypes.Date(end_date)})
 
@@ -49,7 +51,7 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to create booking", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success create booking", res))
+		return c.JSON(http.StatusCreated, templates.Success(http.StatusCreated, "Success add booking", res))
 	}
 }
 
@@ -83,7 +85,7 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 		book.User_uid = middlewares.ExtractTokenId(c)
 
 		//parse string tu date time.Time
-		layoutFormat := "2006-01-02 15:04:05"
+		layoutFormat := "02 Jan 2006"
 		start_date, _ := time.Parse(layoutFormat, book.Start_date)
 		end_date, _ := time.Parse(layoutFormat, book.End_date)
 
