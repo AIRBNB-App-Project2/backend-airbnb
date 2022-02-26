@@ -27,11 +27,11 @@ func (m *MockAuthLib) Login(UserLogin entities.User) (entities.User, error) {
 
 type MockBookingRepo struct{}
 
-func (m *MockBookingRepo) Create(user_uid string, room_uid string, newBooking entities.Booking) (booking.BookingCreateResp, error) {
+func (m *MockBookingRepo) Create(user_uid string, room_uid string, newBooking booking.BookingReq) (booking.BookingCreateResp, error) {
 	return booking.BookingCreateResp{}, nil
 }
 
-func (m *MockBookingRepo) Update(user_uid string, booking_uid string, newBooking entities.Booking) (booking.BookingCreateResp, error) {
+func (m *MockBookingRepo) Update(user_uid string, booking_uid string, upBooking booking.BookingReq) (booking.BookingCreateResp, error) {
 	return booking.BookingCreateResp{}, nil
 }
 

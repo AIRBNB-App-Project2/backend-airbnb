@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -295,54 +296,297 @@ func TestCreate(t *testing.T) {
 
 }
 
-// func TestUpdate(t *testing.T) {
-// 	config := configs.GetConfig()
-// 	db := utils.InitDB(config)
-// 	repo := New(db)
-// 	db.Migrator().DropTable(&entities.User{})
-// 	db.Migrator().DropTable(&entities.Room{})
-// 	db.Migrator().DropTable(&entities.Image{})
-// 	db.Migrator().DropTable(&entities.Booking{})
-// 	db.AutoMigrate(&entities.Booking{})
-// 	db.AutoMigrate(&entities.Image{})
+func TestUpdate(t *testing.T) {
+	config := configs.GetConfig()
+	db := utils.InitDB(config)
+	repo := New(db)
+	db.Migrator().DropTable(&entities.User{})
+	db.Migrator().DropTable(&entities.Room{})
+	db.Migrator().DropTable(&entities.Image{})
+	db.Migrator().DropTable(&entities.Booking{})
+	db.AutoMigrate(&entities.Booking{})
+	db.AutoMigrate(&entities.Image{})
 
-// 	t.Run("success run Update", func(t *testing.T) {
-// 		mock1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
-// 		res1, err1 := user.New(db).Create(mock1)
-// 		if err1 != nil {
-// 			t.Fatal()
-// 		}
-// 		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
-// 		res2, err2 := room.New(db).Create(mock2)
-// 		if err2 != nil {
-// 			t.Fatal()
-// 		}
+	t.Run("success run Update date", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
 
-// 		mock3 := image.ImageReq{}
+		mock3 := image.ImageReq{}
 
-// 		for i := 0; i < 3; i++ {
-// 			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
-// 		}
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
 
-// 		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
-// 			t.Fatal()
-// 		}
+		mockcust := entities.User{Name: "cust name", Email: "cust email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
 
-// 		mock4 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Start_date: datatypes.Date(time.Now().AddDate(0, 0, 2)), End_date: datatypes.Date(time.Now().AddDate(0, 0, 5))}
-// 		res3, err3 := repo.Create(res1.User_uid, res2.Room_uid, mock4)
-// 		if err3 != nil {
-// 			t.Fatal()
-// 		}
-// 		mock5 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Start_date: datatypes.Date(time.Now().AddDate(0, 0, 4)), End_date: datatypes.Date(time.Now().AddDate(0, 0, 14))}
+		star_date := time.Now().AddDate(0, 0, 2).UTC()
+		end_date := time.Now().AddDate(0, 0, 5).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
 
-// 		// mock5 := entities.Booking{User_uid: res1.User_uid, Room_uid: res2.Room_uid, Status: "reservation"}
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
 
-// 		res, err := repo.Update(res1.User_uid, res3.Booking_uid, mock5)
-// 		assert.Nil(t, err)
-// 		assert.NotNil(t, res)
-// 		// log.Info(res)
-// 	})
-// }
+		star_date = time.Now().AddDate(0, 0, 4).UTC()
+		end_date = time.Now().AddDate(0, 0, 6).UTC()
+
+		mocUpdate := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		// log.Info(res)
+	})
+
+	t.Run("success run Update status", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user2 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust2 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 2).UTC()
+		end_date := time.Now().AddDate(0, 0, 5).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		mocUpdate := BookingReq{Status: "paid"}
+
+		res, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		// log.Info(res)
+	})
+
+	t.Run("error in time parse start date", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user3 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust3 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 6).UTC()
+		end_date := time.Now().AddDate(0, 0, 7).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		star_date = time.Now().AddDate(0, 0, 8)
+		end_date = time.Now().AddDate(0, 0, 9).UTC()
+
+		mocUpdate := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
+		// assert.Nil(t, err)
+		assert.NotNil(t, err)
+		// log.Info(err)
+	})
+
+	t.Run("error in time parse end date", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user4 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust4 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 8).UTC()
+		end_date := time.Now().AddDate(0, 0, 9).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		star_date = time.Now().AddDate(0, 0, 8).UTC()
+		end_date = time.Now().AddDate(0, 0, 9)
+
+		mocUpdate := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
+		// assert.Nil(t, err)
+		assert.NotNil(t, err)
+		// log.Info(err)
+	})
+
+	t.Run("error the end date must larger than start date", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user5 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust5 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 10).UTC()
+		end_date := time.Now().AddDate(0, 0, 11).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		star_date = time.Now().AddDate(0, 0, 11).UTC()
+		end_date = time.Now().AddDate(0, 0, 10).UTC()
+
+		mocUpdate := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
+		// assert.Nil(t, err)
+		assert.NotNil(t, err)
+		// log.Info(err)
+	})
+
+	t.Run("error bookiInit is empyty", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user6 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust6 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 12).UTC()
+		end_date := time.Now().AddDate(0, 0, 13).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		star_date = time.Now().AddDate(0, 0, 12).UTC()
+		end_date = time.Now().AddDate(0, 0, 13).UTC()
+
+		mocUpdate := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err := repo.Update(rescust.User_uid, res2.Room_uid, mocUpdate)
+		// assert.Nil(t, err)
+		assert.NotNil(t, err)
+		log.Info(err)
+	})
+
+}
 
 // func TestGetByID(t *testing.T) {
 // 	config := configs.GetConfig()

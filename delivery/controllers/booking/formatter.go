@@ -5,10 +5,12 @@ import (
 )
 
 type CreateBookingRequesFormat struct {
-	User_uid   string
-	Room_uid   string `json:"room_uid" validate:"required"`
-	Start_date string `json:"start_date" validate:"required"`
-	End_date   string `json:"end_date" validate:"required"`
+	User_uid      string
+	Room_uid      string `json:"room_uid" validate:"required"`
+	Start_date    string `json:"start_date" validate:"required"`
+	End_date      string `json:"end_date" validate:"required"`
+	PaymentMethod string `json:"paymentmethod"`
+	Status        string `json:"status"`
 }
 
 type GetBookingResponseFormat struct {

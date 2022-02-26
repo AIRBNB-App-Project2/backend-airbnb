@@ -115,26 +115,27 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 
 	bookingUpdate := entities.Booking{}
 
-	layoutInput := "2006-01-02 15:04:05 +0000 UTC"
-	s_date, errS := time.Parse(layoutInput, upBooking.Start_date)
-	if errS != nil {
-		return BookingCreateResp{}, errors.New("error in time parse start date")
-	}
-	e_date, errE := time.Parse(layoutInput, upBooking.End_date)
-	if errE != nil {
-		return BookingCreateResp{}, errors.New("error in time parse end date")
-	}
-	days := e_date.Sub(s_date).Hours() / 24
-	// log.Info(days)
-	if days < 0 {
-		return BookingCreateResp{}, errors.New("error the end date must larger than start date")
+	if upBooking.Status == "" {
+		layoutInput := "2006-01-02 15:04:05 +0000 UTC"
+		s_date, errS := time.Parse(layoutInput, upBooking.Start_date)
+		if errS != nil {
+			return BookingCreateResp{}, errors.New("error in time parse start date")
+		}
+		e_date, errE := time.Parse(layoutInput, upBooking.End_date)
+		if errE != nil {
+			return BookingCreateResp{}, errors.New("error in time parse end date")
+		}
+		days := e_date.Sub(s_date).Hours() / 24
+		// log.Info(days)
+		if days < 0 {
+			return BookingCreateResp{}, errors.New("error the end date must larger than start date")
+		}
+		bookingUpdate.Start_date = datatypes.Date(s_date)
+		bookingUpdate.End_date = datatypes.Date(e_date)
 	}
 
-	bookingUpdate.Start_date = datatypes.Date(s_date)
-	bookingUpdate.End_date = datatypes.Date(e_date)
 	bookingUpdate.PaymentMethod = upBooking.PaymentMethod
 	bookingUpdate.Status = upBooking.Status
-
 
 	tx := repo.db.Begin()
 
@@ -150,13 +151,13 @@ func (repo *BookingDb) Update(user_uid string, booking_uid string, upBooking Boo
 
 	bookingInit := entities.Booking{}
 
-	if res := tx.Model(&entities.Booking{}).Where("booking_uid = ?", booking_uid).Find(&bookingInit); res.Error != nil {
+	if res := tx.Model(&entities.Booking{}).Where("booking_uid = ?", booking_uid).Find(&bookingInit); res.Error != nil || res.RowsAffected == 0 {
 		tx.Rollback()
 		// log.Info(res)
-		return BookingCreateResp{}, res.Error
+		return BookingCreateResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 
-	if bookingUpdate.Status == "" {
+	if upBooking.Status == "" {
 		resRev := tx.Model(entities.Booking{}).Where("status = 'paid' AND start_date <= ? AND end_date >= ? AND booking_uid != ?", bookingUpdate.End_date, bookingUpdate.Start_date, booking_uid).Find(&bookingInit)
 		// log.Info(resRev.RowsAffected)
 		if resRev.RowsAffected != 0 {
