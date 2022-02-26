@@ -79,8 +79,8 @@ func TestCreate(t *testing.T) {
 
 			"user_uid":   "user_uid",
 			"room_uid":   "room_uid",
-			"start_date": "25 Feb 2022",
-			"end_date":   "28 Feb 2022",
+			"start_date": "01 Mar 2022",
+			"end_date":   "03 Mar 2022",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
