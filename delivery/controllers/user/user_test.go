@@ -172,7 +172,6 @@ func TestGetById(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
 		jwtToken = responses.Data["token"].(string)
-		fmt.Println(jwtToken)
 		assert.Equal(t, responses.Message, "success login")
 	})
 

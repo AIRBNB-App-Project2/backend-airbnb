@@ -32,7 +32,7 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		}
 
 		if err := v.Struct(book); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
 
 		book.User_uid = middlewares.ExtractTokenId(c)
