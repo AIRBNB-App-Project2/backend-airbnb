@@ -490,7 +490,7 @@
           "name" : "city",
           "in" : "query",
           "description" : "get the room's city by city id",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -503,7 +503,7 @@
           "name" : "category",
           "in" : "query",
           "description" : "get the rooms by it category",
-          "required" : false,
+          "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -632,87 +632,6 @@
                     "price" : 2000,
                     "description" : "anonim detail 2",
                     "status" : "open"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/room/owner/{room_uid}" : {
-      "get" : {
-        "tags" : [ "room" ],
-        "summary" : "get single owner's room by room_uid",
-        "description" : "owner can wacth single owner's rooms and parsing user_uid by jwt",
-        "parameters" : [ {
-          "name" : "room_uid",
-          "in" : "path",
-          "description" : "get detail room by room_uid",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : "fnsijni"
-        } ],
-        "responses" : {
-          "500" : {
-            "description" : "internal server error in get single owner's room",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/productHttpResponse"
-                },
-                "example" : {
-                  "code" : 500,
-                  "message" : "error internal server error for get single owner's room"
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "success get single owner's room",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/productHttpResponse"
-                },
-                "example" : {
-                  "code" : 200,
-                  "message" : "success get single owner's room",
-                  "data" : {
-                    "room_uid" : "dsjkandskaj",
-                    "name" : "name room",
-                    "image" : [ "image1", "image2" ],
-                    "address" : "address 1",
-                    "owner_room" : "name owner",
-                    "city" : "malang",
-                    "price" : 2000,
-                    "description" : "anonim detail 2",
-                    "status" : "open",
-                    "bookings" : [ {
-                      "booking_uid" : "njskndsan",
-                      "name" : "room name",
-                      "description" : "roop description",
-                      "start_date" : "2022-02-15T02:18:32.857+0000",
-                      "end_date" : "2022-02-15T02:18:32.857+0000",
-                      "price" : 1000,
-                      "days" : 2,
-                      "price_total" : 2000,
-                      "status" : "reservation"
-                    }, {
-                      "booking_uid" : "sakmdksa",
-                      "name" : "room name 2",
-                      "description" : "room description 2",
-                      "start_date" : "2022-02-15T02:18:32.857+0000",
-                      "end_date" : "2022-02-15T02:18:32.857+0000",
-                      "price" : 1000,
-                      "days" : 2,
-                      "price_total" : 2000,
-                      "status" : "reservation"
-                    } ]
                   }
                 }
               }
