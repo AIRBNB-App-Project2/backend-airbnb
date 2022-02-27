@@ -23,6 +23,11 @@ type PaymentResponse struct {
 	PaymentType string   `json:"payment_type"`
 	Url         []string `json:"url"`
 }
+
+type PaymentTypeRequest struct {
+	Payment_id string `json:"payment_id" validate:"required"`
+}
+
 type RequestCallBackMidtrans struct {
 	Transaction_time   string `json:"transaction_time"`
 	Transaction_status string `json:"transaction_status"`
