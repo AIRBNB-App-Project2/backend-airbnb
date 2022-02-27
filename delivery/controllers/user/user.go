@@ -36,7 +36,7 @@ func (uc *UserController) Create() echo.HandlerFunc {
 		res, err := uc.repo.Create(entities.User{Name: user.Name, Email: user.Email, Password: user.Password})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error fo create new user", err))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error internal server error fo create new user "+err.Error(), err))
 		}
 
 		return c.JSON(http.StatusCreated, templates.Success(http.StatusCreated, "Success create new user", res))
@@ -46,12 +46,12 @@ func (uc *UserController) Create() echo.HandlerFunc {
 func (uc *UserController) GetById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		userUidToken := middlewares.ExtractTokenId(c)
+		userUidToken := middlewares.ExtractTokenUserUid(c)
 
 		res, err := uc.repo.GetById(userUidToken)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "User not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "internal server error in get detail "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get User", res))
@@ -60,7 +60,7 @@ func (uc *UserController) GetById() echo.HandlerFunc {
 
 func (uc *UserController) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userUidToken := middlewares.ExtractTokenId(c)
+		userUidToken := middlewares.ExtractTokenUserUid(c)
 
 		var newUser = UserUpdateRequest{}
 
@@ -71,7 +71,7 @@ func (uc *UserController) Update() echo.HandlerFunc {
 		res, err := uc.repo.Update(userUidToken, entities.User{Name: newUser.Name, Email: newUser.Email, Password: newUser.Password})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusAccepted, templates.Success(http.StatusAccepted, "Success Update User", res))
@@ -80,10 +80,10 @@ func (uc *UserController) Update() echo.HandlerFunc {
 
 func (uc *UserController) Delete() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userUidToken := middlewares.ExtractTokenId(c)
+		userUidToken := middlewares.ExtractTokenUserUid(c)
 
 		if _, err := uc.repo.Delete(userUidToken); err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "There is some error on server "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Delete User", nil))

@@ -142,7 +142,7 @@ func TestGetById(t *testing.T) {
 
 		star_date := time.Now().AddDate(0, 0, 2).UTC()
 		end_date := time.Now().AddDate(0, 0, 5).UTC()
-		mock4 := booking.BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+		mock4 := booking.BookingReq{Start_date: star_date.String(), End_date: end_date.String(), Status: "paid"}
 
 		_, err4 := booking.New(db).Create(resu1.User_uid, res2.Room_uid, mock4)
 		if err4 != nil {

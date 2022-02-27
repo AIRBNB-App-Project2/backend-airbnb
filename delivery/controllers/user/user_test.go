@@ -88,7 +88,31 @@ func TestCreate(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 400, response.Code)
-		assert.Equal(t, "There is some problem from input", response.Message)
+	})
+
+	t.Run("validator", func(t *testing.T) {
+		e := echo.New()
+
+		reqBody, _ := json.Marshal(map[string]string{
+			"name":  "anonim123",
+			"email": "anonim@gmail.com",
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+
+		context := e.NewContext(req, res)
+		context.SetPath("/user")
+
+		userController := New(&MockUserLib{})
+		userController.Create()(context)
+
+		response := GetUserResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 400, response.Code)
 	})
 
 	t.Run("InternalServerError", func(t *testing.T) {
@@ -116,7 +140,6 @@ func TestCreate(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 500, response.Code)
-		assert.Equal(t, "error internal server error fo create new user", response.Message)
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -143,7 +166,6 @@ func TestCreate(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 201, response.Code)
-		assert.Equal(t, "Success create new user", response.Message)
 	})
 }
 
@@ -172,7 +194,6 @@ func TestGetById(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
 		jwtToken = responses.Data["token"].(string)
-		assert.Equal(t, responses.Message, "success login")
 	})
 
 	t.Run("GetById", func(t *testing.T) {
@@ -196,7 +217,30 @@ func TestGetById(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 200, response.Code)
-		assert.Equal(t, "Success Get User", response.Message)
+
+	})
+
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/tasks/:uid")
+
+		taskController := New(&MockFailUserLib{})
+		// taskController.GetById()(context)
+		if err := m.JWT([]byte(configs.JWT_SECRET))(taskController.GetById())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetUserResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 500, response.Code)
 
 	})
 
@@ -227,8 +271,6 @@ func TestUpdate(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
 		jwtToken = responses.Data["token"].(string)
-		fmt.Println(jwtToken)
-		assert.Equal(t, responses.Message, "success login")
 	})
 
 	t.Run("success Update", func(t *testing.T) {
@@ -252,6 +294,59 @@ func TestUpdate(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 202, response.Code)
+
+	})
+
+	t.Run("BadRequest", func(t *testing.T) {
+		e := echo.New()
+
+		reqBody, _ := json.Marshal(map[string]interface{}{
+			"name":     1,
+			"email":    "",
+			"password": "anonim123",
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/users")
+
+		userController := New(&MockUserLib{})
+		if err := m.JWT([]byte(configs.JWT_SECRET))(userController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetUserResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 400, response.Code)
+	})
+
+	t.Run("internal server", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/tasks/:uid")
+
+		taskController := New(&MockFailUserLib{})
+		// taskController.GetById()(context)
+		if err := m.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetUserResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 500, response.Code)
 
 	})
 
@@ -282,8 +377,7 @@ func TestDelete(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
 		jwtToken = responses.Data["token"].(string)
-		fmt.Println(jwtToken)
-		assert.Equal(t, responses.Message, "success login")
+
 	})
 
 	t.Run("success run Delete", func(t *testing.T) {
@@ -307,6 +401,30 @@ func TestDelete(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
 		assert.Equal(t, 200, response.Code)
+
+	})
+
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/user")
+
+		taskController := New(&MockFailUserLib{})
+		// taskController.GetById()(context)
+		if err := m.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetUserResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 500, response.Code)
 
 	})
 

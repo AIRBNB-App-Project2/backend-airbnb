@@ -69,7 +69,7 @@ func (repo *UserDb) GetById(user_uid string) (GetByIdResponse, error) {
 
 	bookings := []BookingUserResp{}
 
-	resB := repo.db.Model(entities.User{}).Where("bookings.user_uid = ?", user_uid).Select("bookings.booking_uid as Booking_uid, rooms.name as Name, rooms.description as Description,rooms.price as Price ,bookings.start_date as Start_date, bookings.end_date as End_date, DATEDIFF(bookings.end_date, bookings.start_date) as Days, DATEDIFF(bookings.end_date, bookings.start_date) * rooms.price as Price_total, bookings.status as Status").Joins("inner join bookings on bookings.user_uid = users.user_uid").Joins("inner join rooms on bookings.room_uid = rooms.room_uid").Find(&bookings)
+	resB := repo.db.Model(entities.User{}).Where("bookings.user_uid = ? AND bookings.status != 'waiting'", user_uid).Select("bookings.booking_uid as Booking_uid, rooms.name as Name, rooms.description as Description,rooms.price as Price ,bookings.start_date as Start_date, bookings.end_date as End_date, DATEDIFF(bookings.end_date, bookings.start_date) as Days, DATEDIFF(bookings.end_date, bookings.start_date) * rooms.price as Price_total, bookings.status as Status").Joins("inner join bookings on bookings.user_uid = users.user_uid").Joins("inner join rooms on bookings.room_uid = rooms.room_uid").Find(&bookings)
 
 	if resB.Error != nil {
 		return GetByIdResponse{}, resB.Error
