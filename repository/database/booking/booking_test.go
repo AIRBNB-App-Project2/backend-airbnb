@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -432,7 +433,7 @@ func TestUpdate(t *testing.T) {
 		res, err := repo.Update(rescust.User_uid, res4.Booking_uid, mocUpdate)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		// log.Info(res)
+		log.Info(res)
 	})
 
 	t.Run("error in time parse start date", func(t *testing.T) {
