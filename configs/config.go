@@ -7,13 +7,14 @@ import (
 )
 
 type AppConfig struct {
-	Port     int
-	Driver   string
-	Name     string
-	Address  string
-	DB_Port  int
-	Username string
-	Password string
+	Port          int
+	Driver        string
+	Name          string
+	Address       string
+	DB_Port       int
+	Username      string
+	Password      string
+	MT_Server_Key string
 }
 
 var lock = &sync.Mutex{}
@@ -38,6 +39,7 @@ func initConfig() *AppConfig {
 	defaultConfig.DB_Port = 3306
 	defaultConfig.Username = getEnv("USERNAME", "root")
 	defaultConfig.Password = getEnv("PASSWORD", "root")
+	defaultConfig.MT_Server_Key = getEnv("MT_SERVER_KEY", "SB-Mid-server-JBHsEAxon8tX0Ui1l4cvMLtM")
 
 	fmt.Println(defaultConfig)
 
