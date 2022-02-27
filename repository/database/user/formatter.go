@@ -24,7 +24,7 @@ type BookingUserResp struct {
 	Price       int    `json:"price"`
 	Days        int    `json:"days"`
 	Price_total int    `json:"price_total"`
-	Status      string `json:"reservation"`
+	Status      string `json:"status"`
 }
 
 type GetByIdResponse struct {
