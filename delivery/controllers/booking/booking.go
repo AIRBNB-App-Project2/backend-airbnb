@@ -4,7 +4,6 @@ import (
 	"be/delivery/controllers/templates"
 	"be/delivery/middlewares"
 	"be/repository/database/booking"
-	"be/repository/database/user"
 	"be/utils"
 	"net/http"
 	"time"
@@ -19,16 +18,14 @@ import (
 )
 
 type BookingController struct {
-	repo     booking.Booking
-	mt       coreapi.Client
-	userRepo user.User
+	repo booking.Booking
+	mt   coreapi.Client
 }
 
-func New(repo booking.Booking, mt coreapi.Client, users user.User) *BookingController {
+func New(repo booking.Booking, mt coreapi.Client) *BookingController {
 	return &BookingController{
-		repo:     repo,
-		mt:       mt,
-		userRepo: users,
+		repo: repo,
+		mt:   mt,
 	}
 }
 

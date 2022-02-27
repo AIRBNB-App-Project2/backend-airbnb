@@ -176,8 +176,9 @@ func TestGetAllRoom(t *testing.T) {
 			t.Fatal()
 		}
 
-		_, err := repo.GetAllRoom(2, "nodata", "nodata")
-		assert.NotNil(t, err)
+		res, err := repo.GetAllRoom(2, "nodata", "nodata")
+		assert.Nil(t, err)
+		assert.Equal(t, 0, len(res))
 		// log.Info(err)
 
 	})

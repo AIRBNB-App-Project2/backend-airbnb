@@ -127,7 +127,7 @@ func (repo *RoomDb) GetAllRoom(length int, city, category string) ([]RoomGetAllR
 
 	res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join cities on rooms.city_id = cities.id").Limit(length).Order("rooms.name ASC").Find(&respRoomAll)
 
-	if res.Error != nil || res.RowsAffected == 0 {
+	if res.Error != nil {
 		return []RoomGetAllResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 
