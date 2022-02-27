@@ -30,7 +30,6 @@ func TestLogin(t *testing.T) {
 		res, err := repo.Login(mockLogin)
 		assert.Nil(t, err)
 		assert.Equal(t, "anonim@123", res.Email)
-		assert.Equal(t, "anonim123", res.Password)
 	})
 
 	t.Run("fail run login", func(t *testing.T) {

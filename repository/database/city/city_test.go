@@ -5,7 +5,6 @@ import (
 	"be/utils"
 	"testing"
 
-	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,6 +18,6 @@ func TestGetAll(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		log.Info(res)
+		// log.Info(res)
 	})
 }

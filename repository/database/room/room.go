@@ -71,11 +71,11 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 
 	resRoom1 := entities.Room{}
 
-	if err := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Find(&resRoom1).Error; err != nil {
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Find(&resRoom1); res.Error != nil || res.RowsAffected == 0 {
 		tx.Rollback()
-		return entities.Room{}, err
+		return entities.Room{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
-
+	resRoom1.ID = 0
 	if resRoom1.User_uid != user_uid {
 		tx.Rollback()
 		return entities.Room{}, errors.New(gorm.ErrInvalidData.Error())
@@ -87,13 +87,13 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 		return entities.Room{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 	resRoom1.DeletedAt = gorm.DeletedAt{}
-	resRoom1.ID = 0
+
 	if res := tx.Create(&resRoom1); res.Error != nil {
 		tx.Rollback()
 		return entities.Room{}, res.Error
 	}
 
-	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Description: upRoom.Description}); res.Error != nil {
+	if res := tx.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Updates(entities.Room{Name: upRoom.Name, Category: upRoom.Category, Price: upRoom.Price, Description: upRoom.Description, Status: upRoom.Status, Address: upRoom.Address}); res.Error != nil {
 		tx.Rollback()
 		return entities.Room{}, res.Error
 	}
@@ -101,33 +101,34 @@ func (repo *RoomDb) Update(user_uid string, room_uid string, upRoom entities.Roo
 	return resRoom1, tx.Commit().Error
 }
 
-func (repo *RoomDb) GetAllRoom(length int, city, category, name, status string) ([]RoomGetAllResp, error) {
+func (repo *RoomDb) GetAllRoom(length int, city, category string) ([]RoomGetAllResp, error) {
 
 	respRoomAll := []RoomGetAllResp{}
 
 	var condition string
 
 	if city != "" {
-		city = "AND cities.name LIKE '%" + city + "%'"
-	}
+		city = "OR cities.name LIKE '%" + city + "%'"
+	} 
+	
+	// else {
+	// 	city = "cities.name LIKE '%" + "city" + "%'"
+	// }
+
 	if category != "" {
 		category = "category =  '" + category + "'"
-	}
-	if status != "" {
-		status = "AND status = '" + status + "'"
-	}
-	if name != "" {
-		name = "AND rooms.name LIKE '%" + name + "%'"
+	} else {
+		category = "category !=  '" + "category" + "'"
 	}
 
-	condition = category + city + status + name
+	condition = category  + city
 	// log.Info(condition)
 	choose := "rooms.room_uid as Room_uid, rooms.name as Name, price as Price, description as Description, status as Status, (SELECT images.url FROM images where images.room_uid = rooms.room_uid and images.deleted_at is null order by images.id limit 1) as Image"
 
 	res := repo.db.Model(&entities.Room{}).Where(condition).Select(choose).Joins("inner join cities on rooms.city_id = cities.id").Limit(length).Order("rooms.name ASC").Find(&respRoomAll)
 
-	if res.Error != nil {
-		return []RoomGetAllResp{}, res.Error
+	if res.Error != nil || res.RowsAffected == 0 {
+		return []RoomGetAllResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 
 	return respRoomAll, nil
@@ -138,8 +139,8 @@ func (repo *RoomDb) GetById(room_uid string) (RoomGetByIdResp, error) {
 
 	res1 := repo.db.Model(&entities.Room{}).Where("room_uid = ?", room_uid).Select("rooms.room_uid as Room_uid, users.name as owner_room, rooms.name as Name, category as Category, address as Address, cities.name as City, description as Description, price as Price, status as Status").Joins("inner join users on users.user_uid = rooms.user_uid").Joins("inner join cities on rooms.city_id = cities.id").Find(&resp)
 
-	if res1.Error != nil {
-		return RoomGetByIdResp{}, res1.Error
+	if res1.Error != nil || res1.RowsAffected == 0 {
+		return RoomGetByIdResp{}, errors.New(gorm.ErrRecordNotFound.Error())
 	}
 
 	images := []Images{}

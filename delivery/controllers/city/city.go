@@ -23,7 +23,7 @@ func (cont *CityController) GetAll() echo.HandlerFunc {
 		res, err := cont.repo.GetAll()
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in get all city data", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in get all city data " + err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(nil, "success get all city data", res))
