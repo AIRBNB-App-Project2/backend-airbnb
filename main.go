@@ -55,7 +55,7 @@ func main() {
 	roomController := room.New(roomRepo, imageRepo)
 
 	bookingRepo := bookingLib.New(db)
-	bookingController := booking.New(bookingRepo, mt, userRepo)
+	bookingController := booking.New(bookingRepo, mt)
 
 	e := echo.New()
 	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController, bookingController)
