@@ -126,7 +126,7 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 		v := validator.New()
 		booking_uid := c.Param("booking_uid")
 		var method_payment_id PaymentTypeRequest
-		user := middlewares.ExtractTokenId(c)
+		// user := middlewares.ExtractTokenId(c)
 
 		c.Bind(&method_payment_id)
 
@@ -140,7 +140,6 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
 		}
-		res_users, err := cont.userRepo.GetById(user)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
 		}
@@ -180,9 +179,9 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 					},
 				},
 				CustomerDetails: &midtrans.CustomerDetails{
-					FName: res_users.Name,
-					LName: "",
-					Email: res_users.Email,
+					FName: "roger",
+					LName: "san",
+					Email: "dani@gmail.com",
 					Phone: "089876543210",
 				},
 				ShopeePay: &coreapi.ShopeePayDetails{
