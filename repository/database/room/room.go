@@ -108,16 +108,20 @@ func (repo *RoomDb) GetAllRoom(length int, city, category string) ([]RoomGetAllR
 	var condition string
 
 	if city != "" {
-		city = "cities.name LIKE '%" + city + "%'"
-	} else {
-		city = "cities.name LIKE '%" + "city" + "%'"
-	}
+		city = "OR cities.name LIKE '%" + city + "%'"
+	} 
+	
+	// else {
+	// 	city = "cities.name LIKE '%" + "city" + "%'"
+	// }
 
 	if category != "" {
 		category = "category =  '" + category + "'"
+	} else {
+		category = "category !=  '" + "category" + "'"
 	}
 
-	condition = category + " OR " + city
+	condition = category  + city
 	// log.Info(condition)
 	choose := "rooms.room_uid as Room_uid, rooms.name as Name, price as Price, description as Description, status as Status, (SELECT images.url FROM images where images.room_uid = rooms.room_uid and images.deleted_at is null order by images.id limit 1) as Image"
 
