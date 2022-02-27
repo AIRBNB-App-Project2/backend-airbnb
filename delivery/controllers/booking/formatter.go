@@ -25,7 +25,7 @@ type PaymentResponse struct {
 	OrderID     string   `json:"order_id"`
 	GrossAmount string   `json:"gross_amount"`
 	PaymentType string   `json:"payment_type"`
-	Url         []string `json:"url"`
+	Url         string `json:"url"`
 }
 
 type PaymentTypeRequest struct {

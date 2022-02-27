@@ -221,9 +221,9 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 		data.OrderID = apiRes.OrderID
 		data.GrossAmount = apiRes.GrossAmount
 		data.PaymentType = apiRes.PaymentType
-		for i := range apiRes.Actions {
-			data.Url = append(data.Url, apiRes.Actions[i].URL)
-		}
+		// for i := range apiRes.Actions {
+		data.Url = /*  append(data.Url,  */ apiRes.Actions[1].URL /* ) */
+		// }
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success create payment booking", data))
 
