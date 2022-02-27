@@ -38,7 +38,7 @@ func (cont *RoomController) GetById() echo.HandlerFunc {
 		res, err := cont.repo.GetById(room_uid)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
@@ -50,14 +50,16 @@ func (cont *RoomController) GetAll() echo.HandlerFunc {
 
 		city := c.QueryParam("city")
 		category := c.QueryParam("category")
-		name := c.QueryParam("name")
-		length, _ := strconv.Atoi(c.QueryParam("length"))
-		status := c.QueryParam("status")
+		length, errL := strconv.Atoi(c.QueryParam("length"))
+		// log.Info(city)
+		if errL != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "internal server error for converting to int "+errL.Error(), nil))
+		}
 
-		res, err := cont.repo.GetAllRoom(length, city, category, name, status)
+		res, err := cont.repo.GetAllRoom(length, city, category)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "internal server error for get all "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get all Room", res))
@@ -76,12 +78,12 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
 		}
 
-		room.User_uid = middlewares.ExtractTokenId(c)
+		room.User_uid = middlewares.ExtractTokenUserUid(c)
 
 		res, err := cont.repo.Create(entities.Room{User_uid: room.User_uid, City_id: room.City_id, Address: room.Address, Name: room.Name, Category: room.Category, Status: room.Status, Price: room.Price, Description: room.Description})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for upload room form", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for upload room form "+err.Error(), nil))
 		}
 
 		form, err1 := c.MultipartForm()
@@ -130,7 +132,7 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 		err4 := cont.repImg.Create(res.Room_uid, imageReq)
 
 		if err4 != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image "+err4.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success add Room", res))
@@ -144,12 +146,12 @@ func (cont *RoomController) Update() echo.HandlerFunc {
 		if err := c.Bind(&room); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
-		user_uid := middlewares.ExtractTokenId(c)
+		user_uid := middlewares.ExtractTokenUserUid(c)
 
-		res, err := cont.repo.Update(user_uid, roomParam, entities.Room{City_id: room.City_id, Address: room.Address, Name: room.Name, Category: room.Category, Status: room.Status, Price: room.Price, Description: room.Description})
+		res, err := cont.repo.Update(user_uid, roomParam, entities.Room{Address: room.Address, Name: room.Name, Category: room.Category, Status: room.Status, Price: room.Price, Description: room.Description})
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for update room "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success update Room", res))
@@ -163,7 +165,7 @@ func (cont *RoomController) Delete() echo.HandlerFunc {
 		res, err := cont.repo.Delete(room_uid)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "error internal server for delete room "+err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success delete Room", res))

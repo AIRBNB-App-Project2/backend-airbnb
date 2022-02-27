@@ -54,7 +54,6 @@ func TestLogin(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.Equal(t, 400, resp.Code)
-		assert.Equal(t, "error in request for login user", resp.Message)
 	})
 
 	t.Run("error internal server error for login user", func(t *testing.T) {
@@ -79,7 +78,6 @@ func TestLogin(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.Equal(t, 500, resp.Code)
-		assert.Equal(t, "error internal server error for login user", resp.Message)
 	})
 
 	t.Run("error in process token", func(t *testing.T) {
@@ -104,7 +102,6 @@ func TestLogin(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.Equal(t, 406, resp.Code)
-		assert.Equal(t, "error in process token", resp.Message)
 	})
 
 	t.Run("success login", func(t *testing.T) {
@@ -129,7 +126,6 @@ func TestLogin(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.Equal(t, 200, resp.Code)
-		assert.Equal(t, "success login", resp.Message)
 	})
 
 }

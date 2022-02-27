@@ -16,7 +16,7 @@ func GenerateToken(u entities.User) (string, error) {
 	}
 
 	codes := jwt.MapClaims{
-		"id":       u.User_uid,
+		"user_uid": u.User_uid,
 		"email":    u.Email,
 		"password": u.Password,
 		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
@@ -28,12 +28,12 @@ func GenerateToken(u entities.User) (string, error) {
 	return token.SignedString([]byte(configs.JWT_SECRET))
 }
 
-func ExtractTokenId(e echo.Context) string {
+func ExtractTokenUserUid(e echo.Context) string {
 	user := e.Get("user").(*jwt.Token) //convert to jwt token from interface
 	if user.Valid {
 		codes := user.Claims.(jwt.MapClaims)
-		id := codes["id"].(string)
-		return id
+		user_uid := codes["user_uid"].(string)
+		return user_uid
 	}
 	return ""
 }
