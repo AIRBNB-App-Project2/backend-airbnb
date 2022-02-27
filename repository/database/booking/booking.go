@@ -301,3 +301,15 @@ func (repo *BookingDb) Delete(booking_uid string) (entities.Booking, error) {
 
 	return bookingResp, nil
 }
+
+func (repo *BookingDb) GetByIdMt(booking_uid string) (entities.Booking, error) {
+	bookingResp := entities.Booking{}
+
+	res := repo.db.Model(entities.Booking{}).Where("booking_uid = ?", booking_uid).Find(&bookingResp)
+
+	if res.Error != nil || res.RowsAffected == 0 {
+		return entities.Booking{}, errors.New(gorm.ErrRecordNotFound.Error())
+	}
+
+	return bookingResp, nil
+}

@@ -12,6 +12,6 @@ type Booking struct {
 	Room_uid      string
 	Start_date    datatypes.Date
 	End_date      datatypes.Date
-	PaymentMethod string `gorm:"type:enum('qris');default:'qris'"`
+	PaymentMethod string `gorm:"type:enum('qris', 'gopay');default:'qris'"`
 	Status        string `gorm:"type:enum('waiting', 'cancel', 'paid');default:'waiting'"`
 }

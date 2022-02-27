@@ -888,7 +888,7 @@ func TestDelete(t *testing.T) {
 	db.AutoMigrate(&entities.Booking{})
 	db.AutoMigrate(&entities.Image{})
 
-	t.Run("success run get by id", func(t *testing.T) {
+	t.Run("success run delete", func(t *testing.T) {
 		mock1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
 		res1, err1 := user.New(db).Create(mock1)
 		if err1 != nil {
@@ -930,7 +930,7 @@ func TestDelete(t *testing.T) {
 		// log.Info(res)
 	})
 
-	t.Run("fail run get by id", func(t *testing.T) {
+	t.Run("fail run delete", func(t *testing.T) {
 		mock1 := entities.User{Name: "user1 name", Email: "user2 email", Password: "user1 password"}
 		res1, err1 := user.New(db).Create(mock1)
 		if err1 != nil {
@@ -971,4 +971,97 @@ func TestDelete(t *testing.T) {
 		// log.Info(err)
 	})
 
+}
+
+func TestGetByIDMt(t *testing.T) {
+	config := configs.GetConfig()
+	db := utils.InitDB(config)
+	repo := New(db)
+	db.Migrator().DropTable(&entities.User{})
+	db.Migrator().DropTable(&entities.Room{})
+	db.Migrator().DropTable(&entities.Image{})
+	db.Migrator().DropTable(&entities.Booking{})
+	db.AutoMigrate(&entities.Booking{})
+	db.AutoMigrate(&entities.Image{})
+
+	t.Run("success run GetByIdMt", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user1 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 2).UTC()
+		end_date := time.Now().AddDate(0, 0, 5).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		res4, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		res, err := repo.GetByIdMt(res4.Booking_uid)
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+	})
+
+	t.Run("fail run GetByIdMt", func(t *testing.T) {
+		mock1 := entities.User{Name: "user1 name", Email: "user2 email", Password: "user1 password"}
+		res1, err1 := user.New(db).Create(mock1)
+		if err1 != nil {
+			t.Fatal()
+		}
+		mock2 := entities.Room{User_uid: res1.User_uid, City_id: 1, Name: "room1 name", Price: 100, Description: "room1 detail", Category: "superior"}
+		res2, err2 := room.New(db).Create(mock2)
+		if err2 != nil {
+			t.Fatal()
+		}
+
+		mock3 := image.ImageReq{}
+
+		for i := 0; i < 3; i++ {
+			mock3.Array = append(mock3.Array, image.ImageInput{Url: (fmt.Sprintf("url%d", i+1))})
+		}
+		if err := image.New(db).Create(res2.Room_uid, mock3); err != nil {
+			t.Fatal()
+		}
+
+		mockcust := entities.User{Name: "cust name", Email: "cust2 email", Password: "cust password"}
+		rescust, errcust := user.New(db).Create(mockcust)
+		if errcust != nil {
+			t.Fatal()
+		}
+
+		star_date := time.Now().AddDate(0, 0, 2).UTC()
+		end_date := time.Now().AddDate(0, 0, 5).UTC()
+		mock4 := BookingReq{Start_date: star_date.String(), End_date: end_date.String()}
+
+		_, err4 := repo.Create(rescust.User_uid, res2.Room_uid, mock4)
+		if err4 != nil {
+			t.Fatal()
+		}
+
+		_, err := repo.GetByIdMt(rescust.User_uid)
+		assert.NotNil(t, err)
+	})
 }

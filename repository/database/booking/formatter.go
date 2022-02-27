@@ -29,3 +29,4 @@ type BookingReq struct {
 	PaymentMethod string `json:"paymentmethod"`
 	Status        string `json:"status"`
 }
+

@@ -29,7 +29,7 @@ type PaymentResponse struct {
 }
 
 type PaymentTypeRequest struct {
-	Payment_id string `json:"payment_id" validate:"required"`
+	Payment_method string `json:"payment_method" validate:"required"`
 }
 
 type RequestCallBackMidtrans struct {

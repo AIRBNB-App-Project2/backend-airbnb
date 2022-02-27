@@ -3,7 +3,6 @@ package booking
 import (
 	"be/delivery/controllers/templates"
 	"be/delivery/middlewares"
-	"be/entities"
 	"be/repository/database/booking"
 	"be/repository/database/user"
 	"be/utils"
@@ -127,12 +126,12 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		v := validator.New()
 		booking_uid := c.Param("booking_uid")
-		var method_payment_id PaymentTypeRequest
+		var payment_method PaymentTypeRequest
 		// user := middlewares.ExtractTokenId(c)
 
-		c.Bind(&method_payment_id)
+		c.Bind(&payment_method)
 
-		if err := v.Struct(method_payment_id); err != nil {
+		if err := v.Struct(payment_method); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
 		}
 
@@ -145,8 +144,8 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
 		}
-		switch method_payment_id.Payment_id {
-		case "1":
+		switch payment_method.Payment_method {
+		case "gopay":
 			result = &coreapi.ChargeReq{
 				PaymentType: coreapi.PaymentTypeGopay,
 
@@ -164,7 +163,7 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 				},
 			}
 
-		case "2":
+		case "shopeepay":
 			result = &coreapi.ChargeReq{
 				PaymentType: coreapi.PaymentTypeShopeepay,
 
@@ -190,7 +189,7 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 					CallbackUrl: "https://plastic-cougar-32.loca.lt/booking/payment/callback",
 				},
 			}
-		case "3":
+		case "qris":
 			result = &coreapi.ChargeReq{
 				PaymentType: coreapi.PaymentTypeQris,
 
@@ -234,19 +233,25 @@ func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 func (cont *BookingController) CallBack() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var request RequestCallBackMidtrans
-		user_uid := middlewares.ExtractTokenId(c)
+		// user_uid := middlewares.ExtractTokenId(c)
 
 		if err := c.Bind(&request); err != nil {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to create payment", nil))
 		}
 
+		res, err := cont.repo.GetByIdMt(request.Order_id)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "internal server eror for get booking by id "+err.Error(), nil))
+		}
+
 		switch request.Transaction_status {
 		case "settlement":
-			cont.repo.Update(user_uid, request.Order_id, entities.Booking{Status: "paid"})
+			cont.repo.Update(res.User_uid, request.Order_id, booking.BookingReq{Status: "paid"})
 		case "failure":
-			cont.repo.Update(user_uid, request.Order_id, entities.Booking{Status: "paid"})
+			cont.repo.Update(res.User_uid, request.Order_id, booking.BookingReq{Status: "waiting"})
 		case "cancel":
-			cont.repo.Update(user_uid, request.Order_id, entities.Booking{Status: "paid"})
+			cont.repo.Update(res.User_uid, request.Order_id, booking.BookingReq{Status: "waiting"})
 
 		}
 

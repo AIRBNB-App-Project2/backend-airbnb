@@ -7,4 +7,5 @@ type Booking interface {
 	Update(user_uid string, booking_uid string, upBooking BookingReq) (BookingCreateResp, error)
 	GetById(booking_uid string) (BookingGetByIdResp, error)
 	Delete(booking_uid string) (entities.Booking, error)
+	GetByIdMt(booking_uid string) (entities.Booking, error)
 }
