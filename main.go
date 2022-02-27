@@ -11,6 +11,8 @@ import (
 	"be/delivery/routes"
 	"fmt"
 
+	"github.com/midtrans/midtrans-go/coreapi"
+
 	authLib "be/repository/database/auth"
 	bookingLib "be/repository/database/booking"
 	cityRep "be/repository/database/city"
@@ -23,11 +25,19 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"github.com/midtrans/midtrans-go"
 )
 
 func main() {
+
+	mt := coreapi.Client{}
+
+	// c := utils.InitConnection()
+	// utils.CreateTransaction(c)
+
 	config := configs.GetConfig()
 	db := utils.InitDB(config)
+	mt.New(config.MT_Server_Key, midtrans.Sandbox)
 
 	userRepo := userLib.New(db)
 	userController := user.New(userRepo)
@@ -45,9 +55,11 @@ func main() {
 	roomController := room.New(roomRepo)
 
 	bookingRepo := bookingLib.New(db)
-	bookingController := booking.New(bookingRepo)
+	bookingController := booking.New(bookingRepo, mt)
 
 	e := echo.New()
 	routes.RoutesPath(e, userController, authController, imageController, cityController, roomController, bookingController)
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
+	// booking.CreateChart()
+
 }

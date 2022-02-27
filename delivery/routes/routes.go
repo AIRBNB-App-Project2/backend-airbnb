@@ -52,7 +52,10 @@ func RoutesPath(e *echo.Echo, uc *user.UserController, ac *auth.AuthController, 
 	//Booking ============================
 	g.POST("/booking", bc.Create())
 	g.GET("/booking/:booking_uid", bc.GetById())
-	g.PUT("/booking/booking_uid", bc.Update())
-	g.DELETE("/booking/booking_uid", bc.Delete())
+	g.PUT("/booking/:booking_uid", bc.Update())
+	g.DELETE("/booking/:booking_uid", bc.Delete())
+	g.POST("/booking/:booking_uid/payment", bc.CreatePayment())
+	e.POST("/booking/payment/callback", bc.CallBack())
+	// g.GET("/booking/:booking_uid/chart", bc.GetChartStatus())
 
 }

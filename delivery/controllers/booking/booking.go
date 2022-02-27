@@ -5,8 +5,13 @@ import (
 	"be/delivery/middlewares"
 	"be/entities"
 	"be/repository/database/booking"
+	"be/utils"
 	"net/http"
 	"time"
+
+	"github.com/midtrans/midtrans-go"
+
+	"github.com/midtrans/midtrans-go/coreapi"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -15,11 +20,13 @@ import (
 
 type BookingController struct {
 	repo booking.Booking
+	mt   coreapi.Client
 }
 
-func New(repo booking.Booking) *BookingController {
+func New(repo booking.Booking, mt coreapi.Client) *BookingController {
 	return &BookingController{
 		repo: repo,
+		mt:   mt,
 	}
 }
 
@@ -109,5 +116,108 @@ func (cont *BookingController) Delete() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success delete booking", res))
+	}
+}
+func (cont *BookingController) CreatePayment() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		booking_uid := c.Param("booking_uid")
+		// method_payment_id, _ := strconv.Atoi(c.FormValue("payment_id"))
+		var result *coreapi.ChargeReq
+
+		res_booking, err := cont.repo.GetById(booking_uid)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Your booking is not found", nil))
+		}
+		// switch method_payment_id {
+		// case 1:
+		result = &coreapi.ChargeReq{
+			PaymentType: coreapi.PaymentTypeGopay,
+
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  booking_uid,
+				GrossAmt: int64(res_booking.Price_total),
+			},
+			Items: &[]midtrans.ItemDetails{
+				{
+					ID:    booking_uid,
+					Name:  res_booking.Name,
+					Price: int64(res_booking.Price),
+					Qty:   int32(res_booking.Days),
+				},
+			},
+		}
+
+		// // case 2:
+		// 	result = &coreapi.ChargeReq{
+		// 		PaymentType: coreapi.PaymentTypeShopeepay,
+
+		// 		TransactionDetails: midtrans.TransactionDetails{
+		// 			OrderID:  booking_uid,
+		// 			GrossAmt: int64(res_booking.Price_total),
+		// 		},
+		// 		Items: &[]midtrans.ItemDetails{
+		// 			{
+		// 				ID:    booking_uid,
+		// 				Name:  res_booking.Name,
+		// 				Price: int64(res_booking.Price),
+		// 				Qty:   int32(res_booking.Days),
+		// 			},
+		// 		},
+		// 	}
+		// // case 3:
+		// // 	result = &coreapi.ChargeReq{
+		// // 		PaymentType: coreapi.PaymentTypeQris,
+
+		// // 		TransactionDetails: midtrans.TransactionDetails{
+		// // 			OrderID:  booking_uid,
+		// // 			GrossAmt: int64(res_booking.Price_total),
+		// // 		},
+		// // 		Items: &[]midtrans.ItemDetails{
+		// // 			{
+		// // 				ID:    booking_uid,
+		// // 				Name:  res_booking.Name,
+		// // 				Price: int64(res_booking.Price),
+		// // 				Qty:   int32(res_booking.Days),
+		// // 			},
+		// // 		},
+		// // 	}
+
+		// }
+
+		apiRes, err := utils.CreateTransaction(cont.mt, result)
+		// log.Info(apiRes)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to create payment", nil))
+
+		}
+
+		var data PaymentResponse
+		data.OrderID = apiRes.OrderID
+		data.GrossAmount = apiRes.GrossAmount
+		data.PaymentType = apiRes.PaymentType
+		for i := range apiRes.Actions {
+			data.Url = append(data.Url, apiRes.Actions[i].URL)
+		}
+
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success create payment booking", data))
+
+	}
+}
+
+func (cont *BookingController) CallBack() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var request RequestCallBackMidtrans
+
+		if err := c.Bind(&request); err != nil {
+			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Failed to create payment", nil))
+		}
+
+		// var strDebug string
+		// strDebug = spew.Sdump(request)
+		// ZapLogger.Info(`request: ` + strDebug)
+
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success create payment booking", request))
+
 	}
 }

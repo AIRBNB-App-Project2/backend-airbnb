@@ -43,7 +43,7 @@ func (cont *RoomController) GetAll() echo.HandlerFunc {
 		city := c.QueryParam("city")
 		category := c.QueryParam("category")
 		name := c.QueryParam("name")
-		length, _ := strconv.Atoi(c.QueryParam("length")) 
+		length, _ := strconv.Atoi(c.QueryParam("length"))
 		status := c.QueryParam("status")
 
 		res, err := cont.repo.GetAllRoom(length, city, category, name, status)
@@ -76,7 +76,7 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, templates.InternalServerError(http.StatusInternalServerError, "Room not found", nil))
 		}
 
-		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Get Room", res))
+		return c.JSON(http.StatusOK, templates.Success(http.StatusOK, "Success Create Room", res))
 	}
 }
 func (cont *RoomController) Update() echo.HandlerFunc {
