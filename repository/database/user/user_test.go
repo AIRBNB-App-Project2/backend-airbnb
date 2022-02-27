@@ -152,7 +152,7 @@ func TestGetById(t *testing.T) {
 		res, err := repo.GetById(resu1.User_uid)
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
-		// log.Info(res, err)
+		log.Info(res, err)
 
 	})
 }
