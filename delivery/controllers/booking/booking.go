@@ -70,16 +70,16 @@ func (cont *BookingController) GetById() echo.HandlerFunc {
 func (cont *BookingController) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		booking_uid := c.Param("booking_uid")
-		v := validator.New()
+		// v := validator.New()
 		var book CreateBookingRequesFormat
 
 		if err := c.Bind(&book); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
 
-		if err := v.Struct(book); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
-		}
+		// if err := v.Struct(book); err != nil {
+		// 	return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
+		// }
 
 		book.User_uid = middlewares.ExtractTokenUserUid(c)
 
