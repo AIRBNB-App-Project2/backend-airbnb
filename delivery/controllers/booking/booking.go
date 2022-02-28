@@ -12,7 +12,6 @@ import (
 
 	"github.com/midtrans/midtrans-go/coreapi"
 
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 )
@@ -31,14 +30,9 @@ func New(repo booking.Booking, mt coreapi.Client) *BookingController {
 
 func (cont *BookingController) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		v := validator.New()
 		var book CreateBookingRequesFormat
 
 		if err := c.Bind(&book); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
-		}
-
-		if err := v.Struct(book); err != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
 
@@ -46,9 +40,15 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		// log.Info(book)
 		//parse string tu date time.Time
 		layoutFormat := "02 Jan 2006"
-		start_date, _ := time.Parse(layoutFormat, book.Start_date)
-		end_date, _ := time.Parse(layoutFormat, book.End_date)
-		log.Info(start_date, end_date)
+		start_date, err1 := time.Parse(layoutFormat, book.Start_date)
+		if err1 != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
+		}
+		end_date, err2 := time.Parse(layoutFormat, book.End_date)
+		// log.Info(start_date, end_date)
+		if err2 != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
+		}
 
 		res, err := cont.repo.Create(book.User_uid, book.Room_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String()})
 
@@ -84,16 +84,19 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", err))
 		}
 
-		// if err := v.Struct(book); err != nil {
-		// 	return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
-		// }
-
 		book.User_uid = middlewares.ExtractTokenUserUid(c)
 
 		//parse string tu date time.Time
 		layoutFormat := "02 Jan 2006"
-		start_date, _ := time.Parse(layoutFormat, book.Start_date)
-		end_date, _ := time.Parse(layoutFormat, book.End_date)
+		start_date, err1 := time.Parse(layoutFormat, book.Start_date)
+		if err1 != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
+		}
+		end_date, err2 := time.Parse(layoutFormat, book.End_date)
+		log.Info(start_date, end_date)
+		if err2 != nil {
+			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
+		}
 
 		res, err := cont.repo.Update(book.User_uid, booking_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String(), Status: book.Status, PaymentMethod: book.PaymentMethod})
 
@@ -121,16 +124,11 @@ func (cont *BookingController) Delete() echo.HandlerFunc {
 }
 func (cont *BookingController) CreatePayment() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		v := validator.New()
 		booking_uid := c.Param("booking_uid")
 		var payment_method PaymentTypeRequest
 		// user := middlewares.ExtractTokenId(c)
 
-		c.Bind(&payment_method)
-
-		if err := v.Struct(payment_method); err != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from input", nil))
-		}
+		payment_method.Payment_method = "gopay"
 
 		var result *coreapi.ChargeReq
 

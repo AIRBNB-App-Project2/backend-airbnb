@@ -1,10 +1,23 @@
 package booking
 
 import (
+	"be/configs"
+	"be/delivery/controllers/auth"
 	"be/entities"
 	"be/repository/database/booking"
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
@@ -32,6 +45,10 @@ func (m *MockBookingRepo) Delete(booking_uid string) (entities.Booking, error) {
 	return entities.Booking{}, nil
 }
 
+func (m *MockBookingRepo) GetByIdMt(booking_uid string) (entities.Booking, error) {
+	return entities.Booking{}, nil
+}
+
 type MockFailBookingRepo struct{}
 
 func (m *MockFailBookingRepo) Create(user_uid string, room_uid string, newBooking booking.BookingReq) (booking.BookingCreateResp, error) {
@@ -50,481 +67,453 @@ func (m *MockFailBookingRepo) Delete(booking_uid string) (entities.Booking, erro
 	return entities.Booking{}, errors.New("")
 }
 
-// func TestCreate(t *testing.T) {
+func (m *MockFailBookingRepo) GetByIdMt(booking_uid string) (entities.Booking, error) {
+	return entities.Booking{}, errors.New("")
+}
 
-// 	jwtToken := ""
-// 	t.Run("Test Login", func(t *testing.T) {
-// 		e := echo.New()
+func TestCreate(t *testing.T) {
 
-// 		requestBody, _ := json.Marshal(map[string]string{
-// 			"email":    "test@gmail.com",
-// 			"password": "xyz",
-// 		})
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
+		e := echo.New()
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
 
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/login")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
+		res := httptest.NewRecorder()
 
-// 		authControl := auth.New(&MockAuthLib{})
-// 		authControl.Login()(context)
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		responses := auth.LoginRespFormat{}
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-// 		jwtToken = responses.Data["token"].(string)
-// 		fmt.Println(jwtToken)
-// 		assert.Equal(t, responses.Message, "success login")
-// 	})
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-// 	t.Run("success Create", func(t *testing.T) {
-// 		// e := echo.New()
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+	t.Run("success Create", func(t *testing.T) {
+		e := echo.New()
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 			"end_date":   "03 Mar 2022",
-// 		})
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking")
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "01 Mar 2022",
+			"end_date":   "03 Mar 2022",
+		})
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking")
 
-// 		response := GetBookingResponseFormat{}
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		response := GetBookingResponseFormat{}
 
-// 		assert.Equal(t, 201, response.Code)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 	})
+		assert.Equal(t, 201, response.Code)
 
-// 	t.Run("bad request", func(t *testing.T) {
-// 		e := echo.New()
+	})
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+	t.Run("bad request", func(t *testing.T) {
+		e := echo.New()
 
-// 			"user_uid": 1,
-// 			"room_uid": 1,
-// 		})
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking")
+			"user_uid": 1,
+			"room_uid": 1,
+		})
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking")
 
-// 		response := GetBookingResponseFormat{}
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		response := GetBookingResponseFormat{}
 
-// 		assert.Equal(t, 400, response.Code)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 	})
+		assert.Equal(t, 400, response.Code)
 
-// 	t.Run("validator", func(t *testing.T) {
-// 		e := echo.New()
+	})
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 		})
+		reqBody, _ := json.Marshal(map[string]interface{}{
+
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "01 Mar 2022",
+			"end_date":   "03 Mar 2022",
+		})
 
-// 		// req := httptest.NewRequest(http.MethodPost, "/", nil)
-// 		// res := httptest.NewRecorder()
-// 		// req.Header.Set("Content-Type", "application/json")
-// 		// req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		// context := e.NewContext(req, res)
-// 		// context.SetPath("/tasks/:uid")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking")
 
-// 		// taskController := New(&MockBookingRepo{})
-// 		// // taskController.GetById()(context)
-// 		// if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
-// 		// 	log.Fatal(err)
-// 		// 	return
-// 		// }
+		taskController := New(&MockFailBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		// response := GetBookingResponseFormat{}
+		response := GetBookingResponseFormat{}
 
-// 		// json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		assert.Equal(t, 400, response.Code)
+		assert.Equal(t, 500, response.Code)
 
-// 	})
+	})
 
-// 	t.Run("internal server error", func(t *testing.T) {
-// 		e := echo.New()
+}
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+func TestGetByID(t *testing.T) {
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
+		e := echo.New()
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 			"end_date":   "03 Mar 2022",
-// 		})
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
+		res := httptest.NewRecorder()
 
-// 		taskController := New(&MockFailBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Create())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		response := GetBookingResponseFormat{}
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-// 		assert.Equal(t, 500, response.Code)
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
 
-// 	})
+	t.Run("success GetById", func(t *testing.T) {
+		e := echo.New()
 
-// }
+		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// func TestGetByID(t *testing.T) {
-// 	jwtToken := ""
-// 	t.Run("Test Login", func(t *testing.T) {
-// 		e := echo.New()
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.GetById())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		requestBody, _ := json.Marshal(map[string]string{
-// 			"email":    "test@gmail.com",
-// 			"password": "xyz",
-// 		})
+		response := GetBookingResponseFormat{}
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/login")
+		assert.Equal(t, 200, response.Code)
 
-// 		authControl := auth.New(&MockAuthLib{})
-// 		authControl.Login()(context)
+	})
 
-// 		responses := auth.LoginRespFormat{}
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
 
-// 		jwtToken = responses.Data["token"].(string)
-// 		fmt.Println(jwtToken)
-// 		assert.Equal(t, responses.Message, "success login")
-// 	})
+		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 	t.Run("success GetById", func(t *testing.T) {
-// 		e := echo.New()
+		taskController := New(&MockFailBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.GetById())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		response := GetBookingResponseFormat{}
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.GetById())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		response := GetBookingResponseFormat{}
+		assert.Equal(t, 500, response.Code)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+	})
 
-// 		assert.Equal(t, 200, response.Code)
+}
 
-// 	})
+func TestUpdate(t *testing.T) {
 
-// 	t.Run("internal server error", func(t *testing.T) {
-// 		e := echo.New()
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
+		e := echo.New()
 
-// 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
 
-// 		taskController := New(&MockFailBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.GetById())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
+		res := httptest.NewRecorder()
 
-// 		response := GetBookingResponseFormat{}
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-// 		assert.Equal(t, 500, response.Code)
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-// 	})
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
 
-// }
+	t.Run("success Update", func(t *testing.T) {
+		e := echo.New()
 
-// func TestUpdate(t *testing.T) {
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 	jwtToken := ""
-// 	t.Run("Test Login", func(t *testing.T) {
-// 		e := echo.New()
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "01 Mar 2022",
+			"end_date":   "03 Mar 2022",
+		})
 
-// 		requestBody, _ := json.Marshal(map[string]string{
-// 			"email":    "test@gmail.com",
-// 			"password": "xyz",
-// 		})
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/login")
+		response := GetBookingResponseFormat{}
 
-// 		authControl := auth.New(&MockAuthLib{})
-// 		authControl.Login()(context)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		responses := auth.LoginRespFormat{}
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+		assert.Equal(t, 202, response.Code)
 
-// 		jwtToken = responses.Data["token"].(string)
-// 		fmt.Println(jwtToken)
-// 		assert.Equal(t, responses.Message, "success login")
-// 	})
+	})
 
-// 	t.Run("success Update", func(t *testing.T) {
-// 		e := echo.New()
+	t.Run("bad request", func(t *testing.T) {
+		e := echo.New()
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 			"end_date":   "03 Mar 2022",
-// 		})
+			"user_uid": 1,
+			"room_uid": 1,
+		})
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		response := GetBookingResponseFormat{}
+		response := GetBookingResponseFormat{}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		assert.Equal(t, 202, response.Code)
+		assert.Equal(t, 400, response.Code)
 
-// 	})
+	})
 
-// 	t.Run("bad request", func(t *testing.T) {
-// 		e := echo.New()
+	t.Run("validator", func(t *testing.T) {
+		e := echo.New()
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 			"user_uid": 1,
-// 			"room_uid": 1,
-// 		})
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "01 Mar 2022",
+		})
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		response := GetBookingResponseFormat{}
+		response := GetBookingResponseFormat{}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		assert.Equal(t, 400, response.Code)
+		assert.Equal(t, 400, response.Code)
 
-// 	})
+	})
 
-// 	t.Run("validator", func(t *testing.T) {
-// 		e := echo.New()
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+		reqBody, _ := json.Marshal(map[string]interface{}{
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 		})
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"start_date": "01 Mar 2022",
+			"end_date":   "03 Mar 2022",
+		})
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		taskController := New(&MockFailBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		response := GetBookingResponseFormat{}
+		response := GetBookingResponseFormat{}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		assert.Equal(t, 400, response.Code)
+		assert.Equal(t, 500, response.Code)
 
-// 	})
+	})
+}
 
-// 	t.Run("internal server error", func(t *testing.T) {
-// 		e := echo.New()
+func TestDelete(t *testing.T) {
+	jwtToken := ""
+	t.Run("Test Login", func(t *testing.T) {
+		e := echo.New()
 
-// 		reqBody, _ := json.Marshal(map[string]interface{}{
+		requestBody, _ := json.Marshal(map[string]string{
+			"email":    "test@gmail.com",
+			"password": "xyz",
+		})
 
-// 			"user_uid":   "user_uid",
-// 			"room_uid":   "room_uid",
-// 			"start_date": "01 Mar 2022",
-// 			"end_date":   "03 Mar 2022",
-// 		})
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
+		res := httptest.NewRecorder()
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		taskController := New(&MockFailBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		authControl := auth.New(&MockAuthLib{})
+		authControl.Login()(context)
 
-// 		response := GetBookingResponseFormat{}
+		responses := auth.LoginRespFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		jwtToken = responses.Data["token"].(string)
+		fmt.Println(jwtToken)
+		assert.Equal(t, responses.Message, "success login")
+	})
 
-// 		assert.Equal(t, 500, response.Code)
+	t.Run("success Delete", func(t *testing.T) {
+		e := echo.New()
 
-// 	})
-// }
+		req := httptest.NewRequest(http.MethodDelete, "/", bytes.NewBuffer(nil))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// func TestDelete(t *testing.T) {
-// 	jwtToken := ""
-// 	t.Run("Test Login", func(t *testing.T) {
-// 		e := echo.New()
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		requestBody, _ := json.Marshal(map[string]string{
-// 			"email":    "test@gmail.com",
-// 			"password": "xyz",
-// 		})
+		response := GetBookingResponseFormat{}
 
-// 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-// 		res := httptest.NewRecorder()
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		req.Header.Set("Content-Type", "application/json")
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/login")
+		assert.Equal(t, 200, response.Code)
 
-// 		authControl := auth.New(&MockAuthLib{})
-// 		authControl.Login()(context)
+	})
 
-// 		responses := auth.LoginRespFormat{}
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+	t.Run("internal server error", func(t *testing.T) {
+		e := echo.New()
 
-// 		jwtToken = responses.Data["token"].(string)
-// 		fmt.Println(jwtToken)
-// 		assert.Equal(t, responses.Message, "success login")
-// 	})
+		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
 
-// 	t.Run("success Delete", func(t *testing.T) {
-// 		e := echo.New()
+		taskController := New(&MockFailBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
 
-// 		req := httptest.NewRequest(http.MethodDelete, "/", bytes.NewBuffer(nil))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
+		response := GetBookingResponseFormat{}
 
-// 		taskController := New(&MockBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
 
-// 		response := GetBookingResponseFormat{}
+		assert.Equal(t, 500, response.Code)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+	})
 
-// 		assert.Equal(t, 200, response.Code)
-
-// 	})
-
-// 	t.Run("internal server error", func(t *testing.T) {
-// 		e := echo.New()
-
-// 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(nil))
-// 		res := httptest.NewRecorder()
-// 		req.Header.Set("Content-Type", "application/json")
-// 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/booking/:booking_uid")
-
-// 		taskController := New(&MockFailBookingRepo{})
-// 		// taskController.GetById()(context)
-// 		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Delete())(context); err != nil {
-// 			log.Fatal(err)
-// 			return
-// 		}
-
-// 		response := GetBookingResponseFormat{}
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-
-// 		assert.Equal(t, 500, response.Code)
-
-// 	})
-
-// }
+}
