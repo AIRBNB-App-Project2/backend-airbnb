@@ -43,8 +43,6 @@ Find vacation rentals, cabins, beach houses, unique homes and experiences around
 
 HLA design for this project shown in the picture below
 
-<img src="images/airbnb.jpeg" alt="hla" width="800" height="462" >
-
 <br />
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -117,8 +115,6 @@ This project use Layered Architure to organized each components into spesific fu
 
 ### Unit Test
 Coverage result on all functions is 60.2% which the most functions have reached 100% coverage. Coverage result for each function shown in the picture below
-
-<img src="images/coverage.jpg" alt="coverage">
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
