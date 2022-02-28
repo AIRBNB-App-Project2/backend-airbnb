@@ -20,7 +20,7 @@ func (repo *ImageDb) Create(room_uid string, image ImageReq) error {
 
 	imgInit := entities.Image{}
 
-	delImg := repo.db.Model(&entities.Image{}).Where("room_uid = ? AND url = 'https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/6216503718eb9324b8213a1f.png'" , room_uid).Delete(&imgInit)
+	delImg := repo.db.Model(&entities.Image{}).Where("room_uid = ? AND url = 'https://karen-givi-bucket.s3.ap-southeast-1.amazonaws.com/621ce06818eb932118627489.png'" , room_uid).Delete(&imgInit)
 
 	if delImg.Error != nil {
 		return delImg.Error
