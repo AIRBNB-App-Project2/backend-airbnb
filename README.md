@@ -114,7 +114,7 @@ This project use Layered Architure to organized each components into spesific fu
   ```
 
 ### Unit Test
-Coverage result on all functions is 60.2% which the most functions have reached 100% coverage. Coverage result for each function shown in the picture below
+Coverage result on all functions is 71% which the most functions have reached 100% coverage. Coverage result for each function shown in the picture below
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
