@@ -116,7 +116,7 @@ This project use Layered Architure to organized each components into spesific fu
 ### Unit Test
 Coverage result on all functions is 71% which the most functions have reached 100% coverage. Coverage result for each function shown in the picture below
 
-<img src="https://github.com/AIRBNB-App-Project2/backend-airbnb/coverage.png" alt="coverage-result">
+<img src="https://github.com/AIRBNB-App-Project2/backend-airbnb/coverage.png" alt="coverage">
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
