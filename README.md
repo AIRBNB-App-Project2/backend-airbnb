@@ -94,10 +94,10 @@ This project use Layered Architure to organized each components into spesific fu
     │     └── open-api-swagger.yaml  
     ├── repository                    # Contains list of functions that process the request and stores it in database
     │     ├── database   
-    │           ├── user_test.go            # Contains list of function for test each function on the repository
-    │           └── user.go                 # Contains list of repository for each entity
+    │           ├── user_test.go      # Contains list of function for test each function on the repository
+    │           └── user.go           # Contains list of repository for each entity
     │    └── erd   
-    │         └── altaProject.drawio                 # Contains list of relations database
+    │         └── altaProject.drawio  # Contains list of relations database
     ├── utils                         
     │     ├── mysqldriver.go          # Contains list of function to config MySQL type database
     │     ├── aws.go                  # Contains list of function to config aws s3
