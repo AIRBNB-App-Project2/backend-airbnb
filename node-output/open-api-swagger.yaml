@@ -415,11 +415,13 @@
               },
               "example" : {
                 "name" : "anonim",
+                "status" : "open",
                 "category" : "standart",
                 "address" : "address",
                 "city_id" : 1,
                 "price" : 20000,
-                "description" : "room description"
+                "description" : "room description",
+                "files" : "foto file"
               }
             }
           },
@@ -503,19 +505,6 @@
           "name" : "category",
           "in" : "query",
           "description" : "get the rooms by it category",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : {
-            "category" : "premium"
-          }
-        }, {
-          "name" : "name",
-          "in" : "query",
-          "description" : "get the list room by name",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -523,7 +512,7 @@
             "type" : "string"
           },
           "example" : {
-            "name" : "villa a"
+            "category" : "premium"
           }
         }, {
           "name" : "length",
@@ -537,19 +526,6 @@
           },
           "example" : {
             "length" : 10
-          }
-        }, {
-          "name" : "status",
-          "in" : "query",
-          "description" : "get the list room by name",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : {
-            "status" : "open"
           }
         } ],
         "responses" : {
