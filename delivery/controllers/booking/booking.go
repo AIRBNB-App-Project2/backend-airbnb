@@ -85,18 +85,21 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 		}
 
 		book.User_uid = middlewares.ExtractTokenUserUid(c)
+		var start_date, end_date time.Time
+		if book.Status == "" {
+			//parse string tu date time.Time
+			layoutFormat := "2006-01-02"
+			start_date, err1 := time.Parse(layoutFormat, book.Start_date)
+			if err1 != nil {
+				return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
+			}
+			end_date, err2 := time.Parse(layoutFormat, book.End_date)
+			log.Info(start_date, end_date)
+			if err2 != nil {
+				return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
+			}
+		}
 
-		//parse string tu date time.Time
-		layoutFormat := "2006-01-02"
-		start_date, err1 := time.Parse(layoutFormat, book.Start_date)
-		if err1 != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
-		}
-		end_date, err2 := time.Parse(layoutFormat, book.End_date)
-		log.Info(start_date, end_date)
-		if err2 != nil {
-			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
-		}
 		// log.Info(start_date,end_date)
 		res, err := cont.repo.Update(book.User_uid, booking_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String(), Status: book.Status, PaymentMethod: book.PaymentMethod})
 
