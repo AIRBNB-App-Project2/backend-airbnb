@@ -39,7 +39,7 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		book.User_uid = middlewares.ExtractTokenUserUid(c)
 		// log.Info(book)
 		//parse string tu date time.Time
-		layoutFormat := "02 Jan 2006"
+		layoutFormat := "2006-01-02"
 		start_date, err1 := time.Parse(layoutFormat, book.Start_date)
 		if err1 != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
@@ -49,7 +49,7 @@ func (cont *BookingController) Create() echo.HandlerFunc {
 		if err2 != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
 		}
-
+		// log.Info(start_date,end_date)
 		res, err := cont.repo.Create(book.User_uid, book.Room_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String()})
 
 		if err != nil {
@@ -87,7 +87,7 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 		book.User_uid = middlewares.ExtractTokenUserUid(c)
 
 		//parse string tu date time.Time
-		layoutFormat := "02 Jan 2006"
+		layoutFormat := "2006-01-02"
 		start_date, err1 := time.Parse(layoutFormat, book.Start_date)
 		if err1 != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing start date", err1))
@@ -97,7 +97,7 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 		if err2 != nil {
 			return c.JSON(http.StatusBadRequest, templates.BadRequest(nil, "There is some problem from parsing end date", err2))
 		}
-
+		// log.Info(start_date,end_date)
 		res, err := cont.repo.Update(book.User_uid, booking_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String(), Status: book.Status, PaymentMethod: book.PaymentMethod})
 
 		if err != nil {
