@@ -104,8 +104,8 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 			s, err2 := session.NewSession(&aws.Config{
 				Region: aws.String("ap-southeast-1"),
 				Credentials: credentials.NewStaticCredentials(
-					"AKIAS4KA3W5H4Z73S3NR",                     // id
-					"XVGjvN4ApOPqNFH95wfmpM06PpQfqiXdDhGuBcFp", // secret
+					"AKIARYSBMFQ57G7DPE6Q",                     // id
+					"lTRDdPA3ar/n9goTQeqs4olmccmRaJyY8JPo5z3k", // secret
 					""),
 			})
 
@@ -119,7 +119,7 @@ func (cont *RoomController) Create() echo.HandlerFunc {
 				return c.JSON(http.StatusInternalServerError, templates.InternalServerError(nil, "error in upload image to s3 aes", nil))
 			}
 
-			image.Url = "https://test-upload-s3-rogerdev.s3.ap-southeast-1.amazonaws.com/" + fileName
+			image.Url = "https://karen-givi-bucket.s3.ap-southeast-1.amazonaws.com/" + fileName
 
 			log.Info(image.Url)
 

@@ -21,7 +21,7 @@ func UploadFileToS3(s *session.Session, file multipart.File, fileHeader *multipa
 	tempFileName := "" + bson.NewObjectId().Hex() + filepath.Ext(fileHeader.Filename)
 
 	_, err := s3.New(s).PutObject(&s3.PutObjectInput{
-		Bucket:        aws.String("test-upload-s3-rogerdev"),
+		Bucket:        aws.String("karen-givi-bucket"),
 		Key:           aws.String(tempFileName),
 		ACL:           aws.String("public-read-write"),
 		Body:          bytes.NewReader(buffer),
