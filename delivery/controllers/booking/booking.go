@@ -100,7 +100,7 @@ func (cont *BookingController) Update() echo.HandlerFunc {
 			}
 		}
 
-		// log.Info(start_date,end_date)
+		log.Info(start_date,end_date)
 		res, err := cont.repo.Update(book.User_uid, booking_uid, booking.BookingReq{Start_date: start_date.String(), End_date: end_date.String(), Status: book.Status, PaymentMethod: book.PaymentMethod})
 
 		if err != nil {

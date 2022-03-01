@@ -308,7 +308,7 @@ func TestUpdate(t *testing.T) {
 		assert.Equal(t, responses.Message, "success login")
 	})
 
-	t.Run("success Update", func(t *testing.T) {
+	t.Run("success Update date", func(t *testing.T) {
 		e := echo.New()
 
 		reqBody, _ := json.Marshal(map[string]interface{}{
@@ -317,6 +317,38 @@ func TestUpdate(t *testing.T) {
 			"room_uid":   "room_uid",
 			"start_date": "2022-03-01",
 			"end_date":   "2022-03-05",
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		context := e.NewContext(req, res)
+		context.SetPath("/booking/:booking_uid")
+
+		taskController := New(&MockBookingRepo{}, coreapi.Client{})
+		// taskController.GetById()(context)
+		if err := middleware.JWT([]byte(configs.JWT_SECRET))(taskController.Update())(context); err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		response := GetBookingResponseFormat{}
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+
+		assert.Equal(t, 202, response.Code)
+
+	})
+
+	t.Run("success Update date status", func(t *testing.T) {
+		e := echo.New()
+
+		reqBody, _ := json.Marshal(map[string]interface{}{
+
+			"user_uid":   "user_uid",
+			"room_uid":   "room_uid",
+			"status":"cancel",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
